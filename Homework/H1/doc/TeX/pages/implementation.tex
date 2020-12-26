@@ -147,7 +147,7 @@ protected:
 }
 \begin{enumerate}
       \item 插入到目标后
-\begin{lstlisting} [firstnumber = 47, caption={Queue::enqueue}]
+\begin{lstlisting} [firstnumber = 792, caption={LinkedList::insertTarget}]
 template<class Type>
 typename LinkedList<Type>::Link
 LinkedList<Type>::insertTarget(LinkedList::Link target, LinkedList::Link link) {
@@ -162,7 +162,7 @@ LinkedList<Type>::insertTarget(LinkedList::Link target, LinkedList::Link link) {
     return link;
 } \end{lstlisting}
       \item 删除目标节点
-\begin{lstlisting} [firstnumber = 47, caption={Queue::dequeue}]
+\begin{lstlisting} [firstnumber = 829, caption={LinkedList::removeTarget}]
 template<class Type>
 bool LinkedList<Type>::removeTarget(Link link, Type& d) {
     d = link->data;
@@ -314,7 +314,7 @@ C++ STL 的哈希表采用了“开链”方式组织解决冲突。“开链”
 \begin{itemize}
       \item \lstinline{ValueType &HashTable<..>::find(const Key &k)}\\
             找到 \lstinline{key} 的值。
-\begin{lstlisting}
+\begin{lstlisting} [firstnumber=446]
 template<..>
 ValueType &
 HashTable<..>::
@@ -331,7 +331,7 @@ find(const Key &k) {
 }\end{lstlisting}
       \item \lstinline{bool HashTable<..>::insertUnique(const ValueType &obj);} \\
             插入一个值。
-\begin{lstlisting}[escapechar=^,]
+\begin{lstlisting}[escapechar=^, firstnumber=409]
 template<..>
 bool
 HashTable<..>::

@@ -10,7 +10,6 @@ class LinkedList {
 public:
 
     struct LinkNode {
-        LinkNode *prev = nullptr;
         LinkNode *next = nullptr;
         Type data;
 
@@ -27,11 +26,10 @@ public:
 
     public:
         explicit Cursor(LinkedList *l);
-        void reset();
-        void next();
-        Link current();
-        const Type &getElement();
-
+        inline void reset();
+        inline void next();
+        inline Link current();
+        inline const Type &getElement();
     };
 
     LinkedList();
@@ -43,40 +41,33 @@ public:
     Link locate(int i) const;
     bool insert(int i, const Type &d);
     bool insert(int i, Link link);
-    bool remove(int i, Type &d);
-    bool remove(int i, Link link = nullptr);
     bool insertBack(const Type &d);
     void forEach(std::function<void(Type &)>);
     void show();
     Cursor getCursor();
 
 protected:
-    Link _head;
-    Link _tail;
-    int _length = 0;
+    Link head;
+    int size = 0;
 
     bool makeNode(Link &) const;
     bool makeNode(Link &, const Type &x) const;
     bool insertTarget(Link tar, Link link);
 };
 
-
 template<class Type>
 LinkedList<Type>::LinkedList() {
-    if (!(makeNode(_head) && makeNode(_tail))) {
+    if (!(makeNode(head))) {
         throw std::runtime_error("Error Creating List");
     }
-    _head->next = _tail;
-    _head->prev = nullptr;
-    _tail->prev = _head;
-    _tail->next = nullptr;
-    _length = 0;
+    head->next = nullptr;
+    size = 0;
 }
 
 template<class Type>
 LinkedList<Type>::~LinkedList() {
     clear();
-    delete _head;
+    delete head;
 }
 
 template<class Type>
@@ -87,7 +78,7 @@ bool LinkedList<Type>::makeNode(Link &link) const {
 
 template<class Type>
 LinkedList<Type>::LinkNode::LinkNode(const Type &x)
-        :prev(nullptr), next(nullptr), data(x) {
+        :next(nullptr), data(x) {
     //empty
 }
 
@@ -99,22 +90,22 @@ bool LinkedList<Type>::makeNode(LinkedList::Link &link, const Type &x) const {
 
 template<class Type>
 int LinkedList<Type>::length() const {
-    return _length;
+    return size;
 }
 
 template<class Type>
 bool LinkedList<Type>::isEmpty() const {
-    return (_length == 0);
+    return (size == 0);
 }
 
 template<class Type>
 typename LinkedList<Type>::Link LinkedList<Type>::locate(int i) const {
-    if (i < 0 || i > _length) {
+    if (i < 0 || i > size) {
         std::cerr << "Invalid Index" << std::endl;
         return nullptr;
     }
-    Link p = _head;
-    if (i == 0) { return _head; }
+    Link p = head;
+    if (i == 0) { return head; }
     while (i--) {
         p = p->next;
     }
@@ -128,10 +119,8 @@ LinkedList<Type>::insertTarget(Link target, Link link) {
         return false;
     }
     link->next = target->next;
-    link->next->prev = link;
     target->next = link;
-    link->prev = target;
-    ++_length;
+    ++size;
     return true;
 }
 
@@ -157,40 +146,12 @@ bool LinkedList<Type>::insert(int i, Link link) {
 }
 
 template<class Type>
-bool LinkedList<Type>::remove(int i, Type &d) {
-    using namespace std;
-    if (isEmpty()) {
-        cerr << "Cannot remove from empty list" << endl;
-        return false;
-    }
-    if (i == 0) {
-        cerr << "Cannot remove head" << endl;
-        return false;
-    }
-    Link target;
-    if (!(target = locate(i))) {
-        return false;
-    }
-    d = target->data;
-    target->prev->next = target->next;
-    target->next->prev = target->prev;
-    --_length;
-    delete target;
-    return true;
-}
-
-template<class Type>
-bool LinkedList<Type>::remove(int i, LinkedList::Link link) {
-    if (link == nullptr) {
-        Type s;
-        return remove(i, s);
-    }
-    return remove(i, link->data);
-}
-
-template<class Type>
 bool LinkedList<Type>::insertBack(const Type &d) {
-    Link target = _tail->prev;
+    Link target = head, p = target->next;
+    while (p != nullptr) {
+        target = p;
+        p = p->next;
+    }
     Link newNode;
     if (!makeNode(newNode, d)) {
         std::cerr << "Error Distributing Memory in insert()" << std::endl;
@@ -204,8 +165,8 @@ template<class Type>
 void LinkedList<Type>::forEach(std::function<void(Type &)> op) {
     if (isEmpty())
         return;
-    Link p = _head->next;
-    int i = _length;
+    Link p = head->next;
+    int i = size;
     while (i--) {
         op(p->data);
         p = p->next;
@@ -216,17 +177,16 @@ template<class Type>
 void LinkedList<Type>::clear() {
     if (isEmpty())
         return;
-    Link p = _head->next;
+    Link p = head->next;
     Link q = p->next;
-    while (q != _tail && q != nullptr) {
+    while (q != nullptr) {
         delete p;
         p = q;
         q = p->next;
     }
     delete p;
-    _length = 0;
-    _head->next = _tail;
-    _tail->prev = _head;
+    size = 0;
+    head->next = nullptr;
 }
 
 template<class Type>
@@ -245,16 +205,16 @@ void LinkedList<Type>::show() {
 
 template<class Type>
 LinkedList<Type>::Cursor::Cursor(LinkedList *l) : _list(l) {
-    _current = _list->_head->next;
+    _current = _list->head->next;
 }
 
 template<class Type>
 void LinkedList<Type>::Cursor::reset() {
-    if (_list->_head == nullptr) {
+    if (_list->head == nullptr) {
         _current = nullptr;
         return;
     }
-    _current = _list->_head->next;
+    _current = _list->head->next;
 }
 
 template<class Type>
@@ -436,6 +396,7 @@ int main() {
         cin >> goOn;
         cin.ignore(numeric_limits<std::streamsize>::max(), '\n');
     }
+    cout << "Bye~\n";
     return 0;
 }
 
