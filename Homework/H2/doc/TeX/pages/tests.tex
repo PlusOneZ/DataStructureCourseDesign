@@ -1,0 +1,237 @@
+
+\chapter{异常}
+在输入时，不合法的字符会引起一些异常来指示当前程序的状态。通过处理这些异常可以改变程序的执行序列，在出错之前%
+将程序的执行权交给处理错的代码。本例的数据结构和系统都有异常类来提供必要的信息。其中一个例子是：
+\begin{lstlisting}[firstnumber=244, caption=HashTableException 异常类]
+class HashTableException : public std::exception {
+public:
+    explicit HashTableException(const char* s) : content(s) { }
+    const char *what() const _NOEXCEPT override {
+        return content;
+    };
+
+    const char* content;
+};
+\end{lstlisting}
+
+异常在合适的代码位置被抛出，但应该被处理，否则用户就会因为未处理的异常在使用程序时遇到软件终止的情况。%
+异常的设计是：该代码段不应该处理该问题或是处理问题时会带来额外的副作用，就应该在此处抛出异常。本项目的%
+异常基本都得到了处理。
+
+
+\lstdefinestyle{console} {
+    language=HTML,
+    backgroundcolor=\color{CPPDark},   
+    commentstyle=\color{CPPLight},
+    keywordstyle=\color{red},
+    ndkeywordstyle={},
+    morekeywords={Unfinished, input, Invalid, character},
+    numbers=none,
+    stringstyle={},
+    basicstyle=\fira\color{white}\footnotesize,
+    breaklines=true,                                     
+    keepspaces=true,                                     
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    escapechar=\%,
+    identifierstyle={},
+}
+
+\chapter{数据测试}
+
+\section{正常情况}
+\begin{enumerate}
+    \item 创建系统数据表
+\begin{lstlisting} [style=console]
+    Constructing Registering System!
+    Enter amount of candidates: 4             -$
+    Enter candidate's ID, name, sex, age and type of examination one by one: 
+    #1: 1234 alice female 20 SSE              -$
+    #2: 2345 Bob male 20 CS                   -$
+    #3: 3456 zzy m 20 DataStructure           -$
+    #4: 4567 miao pet 5 EatAndSleep           -$
+    Unidentified sex pet modified to 'unknown'
+    
+    Total 4 students added
+    No ID       Name        Sex     Age     Type of Examination
+    1. 1234     alice       female  20      SSE
+    2. 2345     Bob         male    20      CS
+    3. 3456     zzy         male    20      DataStructure
+    4. 4567     miao        unknown 5       EatAndSleep
+\end{lstlisting}
+可以看出，不合法的性别会被识别成 unknown。
+
+    \item 目录
+\begin{lstlisting}[style=console]
+    |***** Menu of Commands *****|
+    |  1: Insert      2: Delete  |
+    |  3: Find        4: Edit    |
+    |  5: Statistics  0: Exit    |
+\end{lstlisting}
+
+    \item 添加成员
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 1       -$
+    Enter the position of candidate: 1      -$
+    Enter candidate's ID, name, sex, age and type of examination: 
+    0123 Oscar m 21 Social                  -$
+    No ID       Name        Sex      Age     Type of Examination
+    1. 0123     Oscar       male     21      Social
+    2. 1234     alice       female   20      SSE
+    3. 2345     Bob         male     20      CS
+    4. 3456     zzy         male     20      DataStructure
+    5. 4567     miao        unknown  5       EatAndSleep
+\end{lstlisting}
+
+    \item 删除（按位置）
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 2       -$
+    Choose to remove by [1. Position, 2. Candidate ID]: 
+    1                                       -$
+    Enter candidate's position to remove: 4 -$
+    The candidate removed is: 
+    3456       zzy          male     20      DataStructure
+    No ID      Name         Sex      Age     Type of Examination
+    1. 0123    Oscar        male     21      Social
+    2. 1234    alice        female   20      SSE
+    3. 2345    Bob          male     20      CS
+    4. 4567    miao         unknown  5       EatAndSleep
+\end{lstlisting}
+
+    \item 插入（按考号）
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 2       -$
+    Choose to remove by [1. Position, 2. Candidate ID]: 
+    2                                       -$
+    Enter candidate's ID to remove: 1234    -$
+    The candidate removed is: 
+    1234       alice        female   20      SSE
+    No ID      Name         Sex      Age     Type of Examination
+    1. 0123    Oscar        male     21      Social
+    2. 2345    Bob          male     20      CS
+    3. 4567    miao         unknown  5       EatAndSleep
+\end{lstlisting}
+
+    \item 用考号查找学生
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 3       -$
+    Enter candidate's ID to find: 2345      -$
+    2345     Bob         male    20       CS
+\end{lstlisting}
+
+    \item 修改学生信息（按位置）
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 4       -$
+    Choose to edit by [1. Position, 2. Candidate ID]: 
+    1                                       -$
+    Enter candidate's position to edit: 3   -$
+    Enter candidate's ID, name, sex, age and type of examination: 
+    4567 miao m 16 EatAndWalk               -$
+    No ID       Name        Sex      Age     Type of Examination
+    1. 0123     Oscar       male     21      Social
+    2. 2345     Bob         male     20      CS
+    3. 4567     miao        male     16      EatAndWalk
+\end{lstlisting}
+
+    \item 统计
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 5       -$
+    Male: 3   Female: 0    Unknown: 0
+    No ID       Name        Sex      Age     Type of Examination
+    1. 0123     Oscar       male     21      Social
+    2. 2345     Bob         male     20      CS
+    3. 4567     miao        male     16      EatAndWalk
+\end{lstlisting}
+
+    \item 结束
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 0       -$
+    Bye~
+\end{lstlisting}
+\end{enumerate}
+
+\vspace*{3cm}
+
+\section{输入异常}
+
+\begin{enumerate}
+    \item 创建系统数据表时直接中断
+\begin{lstlisting} [style=console]
+    Constructing Registering System!
+    Enter amount of candidates: 4           -$
+    Enter candidate's ID, name, sex, age and type of examination one by one: 
+    #1: 1234 alice female 20 SSE            -$
+    #2: 2345 Bob male 20 CS                 -$
+    #3:                                     -$ // 输入回车
+    
+    Total 2 students added
+    No ID       Name        Sex       Age       Type of Examination
+    1. 1234     alice       female    20        SSE
+    2. 2345     Bob         male      20        CS
+\end{lstlisting}
+    用回车可以中断输入。
+
+    \item 插入输入不存在的位置
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 1       -$
+    Enter the position of candidate: 6      -$
+    Position should be between 1 to 5       -$
+    Try again: // ...
+\end{lstlisting}
+    位置不存在会提醒重新输入。
+
+    \item 删除：位置不存在
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 2       -$
+    Choose to remove by [1. Position, 2. Candidate ID]: 
+    6                                       -$
+    Try again, enter 1 / 2: 
+    1                                       -$
+    Enter candidate's position to remove: 6 -$
+    Invalid Index
+    Position 6 not found!
+
+    Enter your command, 6 for menu:  // ...
+\end{lstlisting}
+    功能选择错误会提醒重新输入，位置不存在会有提示并退出。
+
+\item 删除：考号不存在
+\begin{lstlisting} [style=console]
+    Enter your command, 6 for menu: 2       -$
+    Choose to remove by [1. Position, 2. Candidate ID]: 
+    2                                       -$
+    Enter candidate's ID to remove: 0000    -$
+    Candidate with ID 0000 not found!
+
+    Enter your command, 6 for menu: // ...
+\end{lstlisting}
+    会给提示并退出。
+
+    \item 查找：找不到考号
+\begin{lstlisting} [style=console]
+    Enter your command, 6 for menu: 3
+    Enter candidate's ID to find: 
+    0000
+    Candidate with ID 0000 not found
+\end{lstlisting}
+    会给提示并退出。
+
+    \item 修改学生信息：位置或考号不存在
+\begin{lstlisting}[style=console]
+    Enter your command, 6 for menu: 4       -$
+    Choose to edit by [1. Position, 2. Candidate ID]: 
+    1                                       -$
+    Enter candidate's position to edit: 6   -$
+    Invalid Index
+    Position 6 not found!
+    Enter your command, 6 for menu: 4       -$
+    Choose to edit by [1. Position, 2. Candidate ID]: 
+    2                                       -$
+    Enter candidate's ID to edit: 0000      -$
+    Candidate with ID 0000 not found!
+\end{lstlisting}
+    与删除类似。
+
+\end{enumerate}

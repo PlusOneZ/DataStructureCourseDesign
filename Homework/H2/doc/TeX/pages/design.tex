@@ -1,0 +1,231 @@
+
+\chapter{背景分析}
+
+在现代计算机中，求交并集是不可缺少的操作，能快速处理交集和并集运算是计算机底层的算法的要求。%
+
+对于已排序的序列进行求交运算是一个简单的问题，并且有$O(n)$的时间复杂度上限。
+
+
+\chapter{功能设计}
+
+\section{题意转化}
+题目给定已知两个非降序链表序列$S_1$和$S_2$，设计函数构造出$S_1$和$S_2$的交集新链表$S_3$。%
+因为{\kaishu 链表}、{\kaishu 非降序}两个条件已经限定，因此求交集更多是一个{\kaishu 算法}，而非数据结构%
+的问题。项目中的链表在数据存储中可能为以下形式，本题只需要一个单向连接的链表就能完成。
+
+\newcommand{\data[1]}{
+      #1 \nodepart{second}
+      \phantom{\texttt{NULL}}
+    }
+
+\begin{figure}[H]
+    \tikzstyle{ptr}  = [draw, -{Stealth[scale=1.0]}, blue]
+    \tikzstyle{head} = [rectangle, draw, text height=3mm, text width=3mm,
+                        text centered, node distance=3cm, inner sep=0pt]
+    \tikzstyle{data} = [rectangle split, rectangle split parts=2, draw, node distance=2.5cm, 
+                        text centered, minimum height=3em]
+    \centering
+    \begin{tikzpicture} [node distance=2cm, auto]
+        \node[head, label=below:phead] (head) {};
+        \node[data, right of=head] (A) {\data[0]};
+        \node[data, right of=A] (B) {\data[1]};
+        \node[data, right of=B] (C) {\data[5]};
+        \node[data, right of=C] (D) {\data[6]};
+        \node[data, right of=D] (E) {-1 \nodepart{second} \texttt{nullptr}};
+        
+    
+        \draw[fill] (head.center) circle (0.05);
+    
+        \path[ptr] (head.center) --++(right:7.5mm) |- (A.text west);
+        \draw[fill] ($(A.south)!0.5!(A.text split)$) circle (0.05);
+        \draw[ptr] ($(A.south)!0.5!(A.text split)$) --++(right:10mm) |- (B.text west);
+        \draw[fill] ($(B.south)!0.5!(B.text split)$) circle (0.05);
+        \draw[ptr] ($(B.south)!0.5!(B.text split)$) --++(right:10mm) |- (C.text west);
+        \draw[fill] ($(C.south)!0.5!(C.text split)$) circle (0.05);
+        \draw[ptr] ($(C.south)!0.5!(C.text split)$) --++(right:10mm) |- (D.text west);
+        \draw[fill] ($(D.south)!0.5!(D.text split)$) circle (0.05);
+        \draw[ptr] ($(D.south)!0.5!(D.text split)$) --++(right:10mm) |- (E.text west);
+    
+    \end{tikzpicture}
+    \caption{单链表结构示意图}
+\end{figure}
+
+解决的关键在以何种方式遍历这两个链表才能达到较好的时间复杂度。
+
+如果对 $S_1$ 中的每一个元素，都去检查 $S_2$ 中是否含有该元素，设 $S_1$\lstinline{.size()} = $n$，$S_1$\lstinline{.size()} = $m$，%
+则该算法是一个时间复杂度 $O(n \times m)$ 的算法，而且没有用上 {\kaishu 非降序} 这个条件。
+
+如果简单地用上{\kaishu 非降序}条件：在检查 $S_2$ 中是否含有 $S_1$ 中某元素$x$时，因为 $S_2$ 已经有序，因此当比较到%
+$S_2$ 中元素大于 $x$ 时，就可以停止比较并且这表示 $x$ 并不在 $S_2$ 中。这种算法还是有退化成 $n \times m$ 次比较的可能%
+（在 $S_1$ 中元素都大于等于 $S_2$ 中元素时），并且平均时间复杂度也还是 $O(n \times m)$。复杂度没有下降的原因在于 $S_1$ %
+的非降序条件依然没有用上。
+
+用上所有条件，该算法的时间复杂度为 $O(n + m)$ 。具体的做法是：两个指针 \lstinline{p}、\lstinline{q} 开始时指向$S_1$和$S_2$%
+的头节点，接下来做以下循环：\label{logic}
+\begin{itemize}
+    \item 如果 \lstinline{p} 或 如果 \lstinline{q} 为空，停止循环。
+    \item 如果 \lstinline{p}、\lstinline{q} 节点的值相等，将该值置入 $S_3$，\lstinline{p}、\lstinline{q}指下一个节点;
+    \item 如果 \lstinline{p} 节点的值大于 \lstinline{q} 的值，\lstinline{p} 指下一个节点。
+    \item 如果 \lstinline{q} 节点的值大于 \lstinline{p} 的值，\lstinline{q} 指下一个节点。
+\end{itemize}
+
+本题考虑了一种极端情况：当输入的数据大于所有 \emph{C++} 可以表示的整数数据类型时，一个输入只能被拆做两个或多个来读取。所以我引入了%
+\emph{Java} 中 \lstinline{BigInteger} 的设计，实现了一个不管多大整数序列都能存储的数据类型。该数据类型重载了输入输出、大小比较%
+以及检查数据是否合理。链表中存放的就是该数据结构，会在\textbf{实现}部分详细说明。
+
+下一节将具体介绍这样的逻辑和解题过程中数据内部结构。
+
+\section{逻辑功能}
+
+\section{流程图}
+
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 2cm, 
+        minimum height=1cm, text centered, draw = black, fill = red!40,
+        font = {\bfseries}]
+    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, 
+    minimum width=2cm, minimum height=1cm, text centered, draw=black, fill = blue!40]
+    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill = yellow!50]
+    \tikzstyle{condition} = [diamond, aspect = 3, text centered, draw=black, fill = green!30]
+    \tikzstyle{arr} = [->, >=stealth, thick]
+
+\subsection{输入逻辑}
+因为本题使用了大整数，且题目也限定了一些重要的先决条件，所以在正式处理序列求交集时需要对序列做输入检查，检查流程如下。
+{
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}
+            \node [startstop] (start) {开始};
+            \node [io, below=0.6cm of start] (input) {输入序列};
+            \node [condition, below=0.6cm of input] (cond1) {序列中每个数都是正整数或$-1$};
+            \node [condition, below=0.6cm of cond1] (cond2) {序列非降序};
+            \node [startstop, below=0.6cm of cond2] (end) {返回有效序列};
+            \node [process, left=1.0cm of cond1] (aban) {抛弃序列};
+
+            \draw [arr] (start) -- (input);
+            \draw [arr] (input) -- (cond1);
+            \draw [arr] (cond1) -- node[anchor=west] {是} (cond2);
+            \draw [arr] (cond2) -- node[anchor=west] {是} (end);
+            \draw [arr] (cond1) -- node[anchor=south] {否} (aban);
+            \draw [arr] (cond2) -| node[anchor=north] {否} (aban);
+
+            \draw [arr] (aban) |- node {} ($ (input.north) + (0, 0.3) $);
+
+        \end{tikzpicture}
+        \caption{输入序列数据逻辑}
+    \end{figure}
+}
+
+\subsection{总体逻辑}
+本部分与第\ref{logic}小节叙述的过程相同，用两个指针来按顺序单次遍历两个序列，从而只要访问 $n+m$ 次序列中的元素%
+就能得到结果 $S_3$。开始时我们将 $S_3$ 设置成空指针，把值置入$S_3$新节点时先给节点分配空间，再用值初始化该节点。
+
+用流程图表示如下：\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \node [startstop] (start) {开始};
+        \node [io, below=0.6cm of start] (input) {输入序列$S_1$、$S_2$};
+        \node [process, below=0.6 of input] (set) {\lstinline{p}、\lstinline{q}指向$S_1$、$S_2$头节点};
+        \node [condition, below=0.6cm of set] (condEnd) {\lstinline{p}或\lstinline{q}不为空};
+        \node [startstop, right=1.2cm of condEnd] (end) {返回$S_3$};
+        \node [condition, below=0.6cm of condEnd] (condEq) {\lstinline{p}、\lstinline{q}值相等};
+        \node [process, left=1.0cm of condEq] (in) {将\lstinline{p}值置入$S_3$};
+        \node [process, above=.3cm of in] (adPQ) {\lstinline{p = p.next;q = q.next}};
+        \node [condition, below=0.6cm of condEq] (condLt) {\lstinline{p}值比\lstinline{q}小};
+        \node [process, below=.6cm of condLt, xshift = -2.5cm] (adP) {\lstinline{p = p.next}};
+        \node [process, below=.6cm of condLt, xshift = 2.5cm] (adQ) {\lstinline{q = q.next}};
+        \node [below=2cm of condLt, transparent] (anchor) {};
+
+        \draw [arr] (start) -- (input);
+        \draw [arr] (input) -- (set) -- (condEnd) -- (condEq) -- (condLt);
+        \draw [arr] (set) -- (condEnd);
+        \draw [arr] (condEnd) -- node[anchor=west] {是} (condEq);
+        \draw [arr] (condEnd) -- node[anchor=south] {否} (end);
+        \draw [arr] (condEq) -- node[anchor=south] {是} (in);
+        \draw [arr] (in) -- (adPQ);
+        \draw [arr] (adPQ) |- ($(condEnd.north) + (0, .3)$);
+        \draw [arr] (condEq) -- node[anchor=west] {否} (condLt);
+        \draw [arr] (condLt) -| node[anchor=east] {是} (adP);
+        \draw [arr] (condLt) -| node[anchor=west] {否} (adQ);
+        \draw [thick] (adQ) |- (anchor.west);
+        \draw [thick] (adP) |- (anchor.west);
+        \draw [thick] (anchor.east) --  ($ (anchor.east) + (-8, 0) $) node {} ;
+        \draw [arr] ($ (anchor.east) + (-8, 0) $) |- ($(condEnd.north) + (0, 0.3)$);
+    \end{tikzpicture}
+    \caption{总体逻辑}
+\end{figure}
+
+
+\section{数据内部结构示意}
+
+以下是某时刻两序列链表$S_1$、$S_2$和结果链表$S_3$中的可能状态。
+
+\begin{figure}[H]
+    \tikzstyle{ptr}  = [draw, -{Stealth[scale=1.0]}, blue]
+    \tikzstyle{head} = [rectangle, draw, text height=3mm, text width=3mm,
+                        text centered, node distance=3cm, inner sep=0pt]
+    \tikzstyle{data} = [rectangle split, rectangle split parts=2, draw, node distance=2.5cm, 
+                        text centered, minimum height=3em]
+    \centering
+    \begin{tikzpicture} [node distance=2cm, auto]
+        \node[head, label=below:$S_1$] (S1head) {};
+        \node[data, right of=S1head] (A) {\data[0]};
+        \node[data, right of=A] (B) {\data[5]};
+        \node[data, right of=B] (C) {\data[6]};
+        \node[data, right of=C] (D) {\data[10]};
+        \node[data, right of=D] (E) {-1 \nodepart{second} \texttt{nullptr}};
+        
+    
+        \draw[fill] (S1head.center) circle (0.05);
+    
+        \path[ptr] (S1head.center) --++(right:7.5mm) |- (A.text west);
+        \draw[fill] ($(A.south)!0.5!(A.text split)$) circle (0.05);
+        \draw[ptr] ($(A.south)!0.5!(A.text split)$) --++(right:10mm) |- (B.text west);
+        \draw[fill] ($(B.south)!0.5!(B.text split)$) circle (0.05);
+        \draw[ptr] ($(B.south)!0.5!(B.text split)$) --++(right:10mm) |- (C.text west);
+        \draw[fill] ($(C.south)!0.5!(C.text split)$) circle (0.05);
+        \draw[ptr] ($(C.south)!0.5!(C.text split)$) --++(right:10mm) |- (D.text west);
+        \draw[fill] ($(D.south)!0.5!(D.text split)$) circle (0.05);
+        \draw[ptr] ($(D.south)!0.5!(D.text split)$) --++(right:10mm) |- (E.text west);
+
+
+        \node[head, label=below:$S_2$, below=1.5cm of S1head] (S2head) {};
+        \node[data, right of=S2head] (A2) {\data[0]};
+        \node[data, right of=A2] (B2) {\data[2]};
+        \node[data, right of=B2] (C2) {\data[5]};
+        \node[data, right of=C2] (D2) {\data[6]};
+        \node[data, right of=D2] (E2) {-1 \nodepart{second} \texttt{nullptr}};
+        
+    
+        \draw[fill] (S2head.center) circle (0.05);
+    
+        \path[ptr] (S2head.center) --++(right:7.5mm) |- (A2.text west);
+        \draw[fill] ($(A2.south)!0.5!(A2.text split)$) circle (0.05);
+        \draw[ptr] ($(A2.south)!0.5!(A2.text split)$) --++(right:10mm) |- (B2.text west);
+        \draw[fill] ($(B2.south)!0.5!(B2.text split)$) circle (0.05);
+        \draw[ptr] ($(B2.south)!0.5!(B2.text split)$) --++(right:10mm) |- (C2.text west);
+        \draw[fill] ($(C2.south)!0.5!(C2.text split)$) circle (0.05);
+        \draw[ptr] ($(C2.south)!0.5!(C2.text split)$) --++(right:10mm) |- (D2.text west);
+        \draw[fill] ($(D2.south)!0.5!(D2.text split)$) circle (0.05);
+        \draw[ptr] ($(D2.south)!0.5!(D2.text split)$) --++(right:10mm) |- (E2.text west);
+
+
+        \node[head, label=below:$S_3$, below=1.5cm of S2head] (S3head) {};
+        \node[data, right of=S3head] (A3) {\data[0]};
+        \node[data, right of=A3] (B3) {5 \nodepart{second} \texttt{nullptr}};
+    
+        \draw[fill] (S3head.center) circle (0.05);
+    
+        \path[ptr] (S3head.center) --++(right:7.5mm) |- (A3.text west);
+        \draw[fill] ($(A3.south)!0.5!(A3.text split)$) circle (0.05);
+        \draw[ptr] ($(A3.south)!0.5!(A3.text split)$) --++(right:10mm) |- (B3.text west);
+
+    
+        \node [above=0.6cm of C] (p) {p};
+        \node [below=.6cm of D2] (q) {q};
+        \draw [ptr] (p) -- (C);
+        \draw [ptr] (q) -- (D2);
+    \end{tikzpicture}
+    \caption{算法数据组织示意图}
+\end{figure}

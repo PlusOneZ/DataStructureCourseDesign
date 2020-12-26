@@ -1,0 +1,41 @@
+% History
+
+\chapter{更新历史}
+
+\noindent\textsf{版本v2.00更新}\marginnote{2020/11/28}
+\begin{enumerate}[label=\color{three}\protect\circled{\arabic*}]
+    \item 全新升级，增加各类文类可选项。包括\textbf{字体、标题编号、版面、颜色主题、参考文献格式、草稿标记、目录分栏和语言等}，加入\textsf{部分}结构。
+    \item 对字体设置详细修改，中文黑体及宋体均用 \lstinline{xeCJK} 宏包设置伪粗，并将这些特性用于各类标题的设置中。
+    \item 使用 \lstinline{cleveref} 宏包进行引用，已预设与正文字间距且多数情况仅使用 \lstinline{\cref} 命令即可。
+    \item 使用 \lstinline{\setlist} 具体设置列表间距与缩进，调整图表的间距与浮动参数。
+    \item 使用文档结构命令 \lstinline{\frontmatter}、\lstinline{\mainmatter} 和 \lstinline{\backmatter} 修复目录超链接位置和页眉章节内容显示错误问题，增加并改进图片与表格索引目录。
+    \item 加入 \lstinline{mhchem} 与 \lstinline{chemfig} 宏包输出化学式，加入 \lstinline{ulem} 宏包输出可设置样式的下划线。
+    \item 由于 \lstinline{subfig} 宏包长期未维护可能存在兼容性问题，改用 \lstinline{subcaption} 排列子图。
+\end{enumerate}
+
+\noindent\textsf{版本v1.16更新}\marginnote{2020/10/03}
+\begin{enumerate}[label=\color{three}\protect\circled{\arabic*}]
+    \item 使用 \lstinline{amsthm} 宏包取代 \lstinline{ntheorem} 设置定理环境。
+    \item 使用 \lstinline{siunitx} 宏包输出标准单位。
+    \item 增加 \lstinline{tabu} 宏包作为表格设置备用。
+    \item 去除 \lstinline{\upcite} 命令，使用 \lstinline{natbib} 的 \lstinline{super} 参数统一上标引用格式。
+    \item 规范代码排列缩进，删除多余宏包与代码，改变混乱状态。
+    \item 重新定义附录命令 \lstinline{\appendix}。
+    \item 去除 \lstinline{titlesec} 宏包，避免与 \lstinline{ctex} 冲突。
+    \item 设置 \lstinline{listings} 代码环境。 
+\end{enumerate}
+
+\noindent\textsf{版本v1.07更新}\marginnote{2020/04/25}
+\begin{enumerate}[label=\color{three}\protect\circled{\arabic*}]
+    \item 使用 \lstinline{titletoc} 宏包取代 \lstinline{tocloft} 宏包设置目录更为直接。
+    \item 对 \lstinline{\ref} 重新包装来定义图表定理等引用。
+    \item 宏包排列顺序调整，引入 \lstinline{subfig} 宏包用于排列子图。
+    \item 修改多级列表编号与对齐格式，去掉脚注圆圈。
+\end{enumerate}
+
+\noindent\textsf{版本v1.00创建}\marginnote{2020/03/10}
+\begin{enumerate}[label=\color{three}\protect\circled{\arabic*}]
+    \item 为初始版本，在\href{https://github.com/mtobeiyf/whu-thesis}{武汉大学}本科毕业论文\LaTeX 模板的基础上修改标题字体间距等格式而来，改动较少，编译警告多。
+    \item 修改页眉页脚，增加页眉线。略微修改目录样式。
+    \item 使用 \lstinline{titlesec} 设置标题格式。
+\end{enumerate}

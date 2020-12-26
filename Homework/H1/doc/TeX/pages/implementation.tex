@@ -1,0 +1,458 @@
+
+\chapter{类结构}
+由于使用了哈希表，本项目的代码结构较为复杂，因此加以解释。\lstinline{HashTable} 类是仿照 \emph{C++ STL} 源码实现的，其中使用了%
+\lstinline{Vector} 类，所以代码中出现在上面的类型（本应该被 \lstinline{#include} 进来）是下面类型的依赖，而不是更重要的意思。%
+下面按照一定的逻辑顺序介绍这几个类：
+
+\begin{itemize}
+    \item \lstinline{LinkedList} 类\\
+    链表类，存放顺序的学生名单结构。有 \lstinline{insert, remove, forEach} 方法用于插入、删除、遍历操作。
+    \item \lstinline{HashTable} 类\\
+    其中维护了一个 \lstinline{HashNode} 的 \lstinline{Vector}，通过其哈希函数（\lstinline{hash function}）完成对\lstinline{Vector}%
+    数组的索引。主要通过\lstinline{find} 和 \lstinline{hasKey}索引和判断键的存在与否，通过 \lstinline{insert} 方法插入一个键唯一的对象。%
+    通过 \lstinline{erase} 方法抹去一个值。
+    \item \lstinline{StringHashMap} 类\\
+    包装和特化之后的一个哈希键值对集合，通过字符串进行索引得到对应值，范型参数为值的类型。可以通过\lstinline{find} 和 %
+    \lstinline{hasKey}索引和判断键的存在与否，通过 \lstinline{insert} 方法插入一个键唯一的对象。%
+    通过 \lstinline{erase} 方法抹去一个值。并且重载了下标运算符 \lstinline{[]}，将字符串作为下标可以索引对应的值。
+    \item \lstinline{Vector} 类\\
+    \lstinline{HashTable} 类用与存放\lstinline{HashNode}的数组，相同哈希值的对象会以链表的方式存放在这个数组的单元里。%
+    在\lstinline{HashTable} 类的实现中主要用到了下标运算、\lstinline{reserve(n)} 方法：开辟 $n$ 长度的数组。\lstinline{resize(n)}%
+    方法：重新分配 $n$ 长度的内存。
+    \item \lstinline{Student, System} 类\\
+    \lstinline{Student} 类是学生信息的封装，\lstinline{System} 类是交互系统实现，通过 \lstinline{run} 函数来开启，%
+    内部封装了指令显示、读取以及指令实现的函数。
+\end{itemize}
+
+该部分主要详细介绍\lstinline{LinkedList} 链表类和 \lstinline{HashTable} 哈希表类的实现，其余部分简单概括被使用的接口。
+
+
+\chapter{LinkedList 类}
+
+\section{API}
+
+\subsection{类定义}
+以下是本题使用队列的 API，各函数的功能已用注释标出。
+\begin{lstlisting}[morendkeywords={LinkedList}, firstnumber=637, caption=LinkedList 类定义]{}
+template <class Type>
+class LinkedList {
+public:
+
+    struct LinkNode {           // 嵌套节点类
+        LinkNode *prev = nullptr;
+        LinkNode *next = nullptr;
+        Type data;
+
+        LinkNode() = default;
+        explicit LinkNode(const Type &);
+    };
+
+    typedef LinkNode* Link;           // 别名
+
+    LinkedList();                     // 构造器
+    LinkedList(LinkedList const &);
+    ~LinkedList();
+
+    int length() const;               // 大小
+    bool isEmpty() const;             // 是否为空
+    Link getHead() const;             // 获取首节点
+    Link getTail() const;             // 获取尾节点
+    int search(const Type& x) const;  //搜索和谓词搜索
+    int searchByMethod(std::function<bool(Type&)> m);
+    Link locate(int i) const;         // 取索引
+    Link insert(int i, const Type& d);// 插入
+    Link insert(int i, Link link);    
+    Link insertTarget(Link tar, Link link);
+    Link insertBack(const Type& d);   // 后端插入
+    bool remove(int i, Type& d);      // 删除
+    bool remove(int i, Link link = nullptr);
+    bool removeTarget(Link link, Type& d);
+
+    void forEach(std::function<void(Type&)>);
+                                      // 对所有节点操作 
+
+protected:
+    Link head;
+    Link tail;
+    int elemNum = 0;
+
+    bool makeNode(Link &) const;      // 分配新节点
+    bool makeNode(Link &, const Type& x) const;
+};
+\end{lstlisting}
+\vspace*{1cm}
+
+{
+\lstset{
+    basicstyle=\ttfamily\color{CPPDark}, 
+    numberstyle=\tiny\color{darkgray},
+    keywordstyle=\color[RGB]{40,40,255},
+    }
+\subsection{公开成员}
+\begin{enumerate}
+    \item \lstinline{Link insertTarget(Link tar, Link link);}
+          插入在 \lstinline{tar} 后面。返回插入节点的指针。该函数有两个托管函数，通过位置 $i$ 来索引节点。
+    \item \lstinline{bool removeTarget(Link link, Type& d);}
+          删除 \lstinline{tar} 节点。返回是否成功。该函数有两个托管函数，通过位置 $i$ 来索引节点。
+    \item \lstinline{Link locate(int i) const;} \\
+          从位置$i$取出一个节点，如果没有节点则报错并返回 \lstinline{nullptr}。
+    \item \lstinline{int search(const Type& x) const;} \\
+          遍历找到值为 \lstinline{x} 的节点的位置，找不到返回-1。
+    \item \lstinline{int searchByMethod(std::function<bool(Type&)> method);} \\
+          返回第一个 \lstinline{method} 函数返回值为 \lstinline{true} 的节点的位置，找不到返回-1.
+    \item \lstinline{void forEach(std::function<void(Type&)> op);} \\
+          对每个元素都调用操作 \lstinline{op}，可以用于格式打印等操作。
+\end{enumerate}
+
+\subsection{私有成员}
+\begin{enumerate}
+    \item \lstinline{Link head; Link tail;} \\
+          该链表的头节点和尾节点。
+    \item \lstinline{int elemNum = 0;} \\
+          链表中现有元素的个数。
+    \item \lstinline{bool makeNode(Link &, const Type& x) const;} \\
+          用 $x$ 的值来分配并初始化一个新的节点，失败返回 \lstinline{nullptr}。
+\end{enumerate}
+}
+
+\section{代码逻辑与实现}
+
+\subsection{逻辑描述}
+
+
+双链表中，最主要改变其结构的动作是 {\kaishu 插入} 和 {\kaishu 删除}，因此要说明这两个部分的内容。
+
+插入节点时，先找到这个节点的前驱（后继向前走一格便是前驱），然后做按照顺序对目标节点操作：
+
+\begin{itemize}
+    \item 目标节点的后继指针指向前驱的后继，目标节点的前驱指针指向前驱；
+    \item 前驱的后继指针指向目标；
+    \item 后继的前驱指针指向目标。
+\end{itemize}
+
+删除节点时，先找到这个目标节点，然后按照顺序对目标节点操作：
+\begin{itemize}
+    \item 目标的前驱的后继指针指向目标的后继。
+    \item 目标的后继的前驱指针指向目标的前驱。
+    \item 释放目标的内存。
+\end{itemize}
+
+
+\subsection{代码实现}
+
+{
+\lstset{
+      morendkeywords={LinkedList},
+      morendkeywords = {head, tail, elemNum}
+}
+\begin{enumerate}
+      \item 插入到目标后
+\begin{lstlisting} [firstnumber = 47, caption={Queue::enqueue}]
+template<class Type>
+typename LinkedList<Type>::Link
+LinkedList<Type>::insertTarget(LinkedList::Link target, LinkedList::Link link) {
+    if (target == nullptr) {
+        return nullptr;
+    }
+    link->next = target->next;
+    link->next->prev = link;
+    target->next = link;
+    link->prev = target;
+    ++elemNum;
+    return link;
+} \end{lstlisting}
+      \item 删除目标节点
+\begin{lstlisting} [firstnumber = 47, caption={Queue::dequeue}]
+template<class Type>
+bool LinkedList<Type>::removeTarget(Link link, Type& d) {
+    d = link->data;
+    link->prev->next = link->next;
+    link->next->prev = link->prev;
+    try {
+        delete link;
+    } catch (std::exception& e) {
+        return false;
+    }
+    --elemNum;
+    return true;
+}\end{lstlisting}
+      
+\end{enumerate}
+}
+
+\chapter{HashTable 类}
+
+仿照了 C++ STL 的哈希表实现。
+
+\section{API}
+
+\subsection{类定义}
+{
+\lstset{morendkeywords={HashTable}}
+\begin{lstlisting}[firstnumber=283, caption=HashTable 类定义]{}
+template<class ValueType, class Key, class HashFunction,
+        class ExtractKey, class EqualKey>
+class HashTable {
+public:
+    explicit HashTable(size_t n);
+
+    inline size_t maxBucketNum() const;      // 最大容量
+    inline size_t bucketCount() const;       // 当前容量
+    bool insertUnique(const ValueType& obj); // 插入值
+    void clear();                            // 清空
+    ValueType & find(const Key&);            // 用键查找
+    ValueType & findOrInsert(const ValueType& obj);     // 查找或插入值
+    bool hasKey(const Key& k);          // 查键记录
+    inline bool empty() const;          // 是否为空
+    size_t erase(const Key& key);       // 抹去一个键值
+    void resize(size_t hint);           // 重分配容量
+
+private:
+    typedef HashNode<ValueType> node;   // 节点
+    typedef HashFunction hasher;        // 哈希函数类
+    typedef EqualKey equal_key;         // 判断等值类
+
+    hasher hash;            // 哈希函数对象
+    ExtractKey getKey;      // 获取键函数对象
+    equal_key equals;       // 判断等值函数对象
+
+    Vector<node *> buckets; // 存值的容器
+    size_t num_elements;    // 元素个数
+    static constexpr int num_primes = 28;    // 见解释
+    static const unsigned long prime_list[num_primes];
+        // 找质数、调用哈希函数
+    inline unsigned long next_prime(unsigned long n);
+    inline size_t findBucketKey(const Key &key, size_t size) const;
+    inline size_t findBucket(const ValueType &obj) const;
+    inline size_t findBucket(const ValueType &obj, size_t size) const;
+};
+\end{lstlisting}
+
+
+\lstinline{HashTable} 有五个模板参数：\lstinline{ValueType} 为存放值类型，\lstinline{Key} 为键类型\footnote{这里的键、值关系并非%
+键值对的关系，\lstinline{HashTable} 的值通过\lstinline{ExtractKey}类可以取出键，他们是包含关系而不是关联。}，%
+\lstinline{HashFunction} 可算出 \lstinline{Key}对象对应的哈希值， \lstinline{ExtractKey} 取出 \lstinline{ValueType} 中的键，%
+\lstinline{EqualKey} 可以比较两键是否相等。
+
+\section{代码逻辑与实现}
+
+\subsection{逻辑描述}
+
+哈希表是一个查找和添加元素平均开销均为 $O(1)$ 的数据结构，其特点是数据的存储方式为将数据分散在数组里，并以数组的下标来表征元素的特征。元素的值%
+与下标之间的关系满足函数关系，也就是对于任意的元素取值都能找到哈希表中的唯一下标与之对应。由于数据的分散特征，哈希表又称{散列表}。在哈希表中查找一个%
+数据可称作“索引”，数据一定要有{\kaishu 可哈希性（可散列性）}，即该数据的{\kaishu 键(Key)}可以通过一个函数获得一个唯一个值，%
+相同的键的函数值也相同。由于一般的哈希函数算出的值都是非负整数，很难保证不同键的哈希值不相同（如果这样就能构成一一对应关系），%
+因此要实现哈希表还要解决{\kaishu 冲突}问题.
+
+C++ STL 的哈希表采用了“开链”方式组织解决冲突。“开链”之意为在表的单元中存放链表的指针，并将应该放在该表中的元素用链表延伸出去。如图 \ref{hash} 所示，%
+一个单元中有元素就存放首节点的指针，以单链表延伸；如果没有元素，就要存放空指针。这样，一个哈希表所有键冲突元素都可以存在一个单元中，并且查找某个哈希值对应的%
+键值是否存在表中时，只需要单向遍历这个单元的链表就行。理想情况下，键与哈希值是均匀分布的，每个单元只存储一个键；最坏条件下，哈希表退化成链表，查找开销为 $O(n)$。
+
+以下是流程图：
+
+{
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}
+            \node (start) [startstop]  {开始};
+            \node [io, below=.6cm of start] (input) {输入键 \lstinline{key}};
+            \node [process, below=.6cm of input] (hash) {算出 \lstinline{key} 的哈希值 \lstinline{hash}};
+            \node [process, below=.6cm of hash] (get) {\lstinline{hash} 下标位置的节点指针 \lstinline{p}};
+            \node [condition, below=.6cm of get] (cond1) {\lstinline{p} 不为空};
+            \node [condition, below=.6cm of cond1] (cond2) {\lstinline{p->key} != \lstinline{key}};
+            \node [process, below=.6cm of cond2] (find) {返回\lstinline{p}节点的值};
+            \node [process, below=.6cm of cond2, xshift = 4cm] (notFound) {返回空值};
+            \node [startstop, below=.6cm of find] (end) {结束};
+
+            \draw [arr] (start) -- (input);
+            \draw [arr] (input) -- (hash);
+            \draw [arr] (hash) -- (get);
+            \draw [arr] (get) -- (cond1);
+            \draw [arr] (cond1) -- node[anchor=east] {是} (cond2);
+            \draw [arr] (cond2) -- node[anchor=east] {否} (find);
+            \draw [arr] (find) -- (end);
+            \draw [arr] (notFound.south) |- (end);
+
+            \draw [arr] (cond1) -- ($(cond1.east) + (0.9, 0)$) node[anchor = south] {否} -| (notFound.north);
+            \draw [arr] (cond2) -- ($(cond2.west) + (-0.5, 0)$) node[anchor = east] {是} |- ($ (cond1.north) + (0, 0.3) $);
+
+        \end{tikzpicture}
+        \caption{查找HashTable中的值}
+    \end{figure}
+}
+
+{
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}
+            \node (start) [startstop]  {开始};
+            \node [io, left=1.0cm of start] (input) {输入值 \lstinline{value}};
+            \node [process, below=.6cm of input] (hash) {算出 \lstinline{value} 的哈希值 \lstinline{hash}};
+            \node [process, below=.6cm of hash] (get) {\lstinline{hash} 下标位置的节点指针 \lstinline{p}};
+            \node [process, below=.6cm of get] (find) {\lstinline{value} 生成节点插入 \lstinline{p} 链表的首位置};
+            \node [startstop, right=1.0cm of find] (end) {结束};
+
+            \draw [arr] (start) -- (input);
+            \draw [arr] (input) -- (hash);
+            \draw [arr] (hash) -- (get);
+            \draw [arr] (get) -- (find);
+            \draw [arr] (find) -- (end);
+
+        \end{tikzpicture}
+        \caption{添加值到HashTable}
+    \end{figure}
+}
+
+另外，\lstinline{HashTable} 的数组是自动分配大小的，因此采用了 \lstinline{Vector} 类的 \lstinline{resize} 函数。%
+\lstinline{HashTable} 扩充内存的逻辑是：当含有元素个数大于当前数组的大小（单元个数）时，就将容量扩大大约一倍。实际上 \lstinline{HashTable} %
+中的数组大小取值为一系列呈两倍递增的质数，因为模取质数获得的下标能尽可能保证均匀。
+
+\subsection{代码实现}
+
+下面展示\lstinline{HashTable}关键代码。（省略了范型参数）
+
+\begin{itemize}
+      \item \lstinline{ValueType &HashTable<..>::find(const Key &k)}\\
+            找到 \lstinline{key} 的值。
+\begin{lstlisting}
+template<..>
+ValueType &
+HashTable<..>::
+find(const Key &k) {
+    size_t n = findBucketKey(k, buckets.length());
+    node *first = buckets[n];   // 索引头节点
+    if (first == nullptr) throw HashTableException("Key Not Exist");
+    for (node *cur = first; cur; cur = cur->next) {
+        if (equals(getKey(cur->value), k)) {
+            return cur->value;  // 找到
+        }
+    } // 没找到
+    throw HashTableException("Key Not Exist");
+}\end{lstlisting}
+      \item \lstinline{bool HashTable<..>::insertUnique(const ValueType &obj);} \\
+            插入一个值。
+\begin{lstlisting}[escapechar=^,]
+template<..>
+bool
+HashTable<..>::
+insertUnique(const ValueType &obj) {
+    resize(num_elements + 1);   // 检查是否扩充
+    const size_t pos = findBucket(obj);
+    node *first = buckets[pos]; // 用哈希值索引
+
+    for(node *cur = first; cur; cur = cur->next) {
+        if (equals(getKey(obj), getKey(cur->value)))
+            return false;       // 重复不添加
+    }
+    // 添加
+    auto temp = new node(obj);
+    temp->next = first;
+    buckets[pos] = temp;
+    ++num_elements;
+    return true;
+}\end{lstlisting}
+\end{itemize}
+
+
+\section{StringHashMap 类}
+
+用 \lstinline{HashTable} 存放了 \lstinline{Pair<std::string, Type>} 类型的封装，可以用与存放键值对，通过字符串键索引值。%
+因为都是调用 \lstinline{HashTable} 的方法，这里只展示类定义 API。
+
+
+\subsection{Pair 类定义}
+\lstset{morendkeywords={Pair}}
+\begin{lstlisting}[firstnumber=551, caption=Pair 类定义]{}
+template<class First, class Second>
+struct Pair {
+    typedef First firstType;
+    typedef Second SecondType;
+
+    First first;
+    Second second;
+
+    Pair() : first(First()), second(Second()) {}
+    Pair(const First &t1, const Second &t2) : first(t1), second(t2) {}
+    Pair(const Pair &p) : first(p.first), second(p.second) { }
+
+    Pair &operator=(const Pair& p) { // 重载等号
+        if (&p == this)
+            return *this;
+        first = p.first; second = p.second;
+        return *this;
+    }
+};
+\end{lstlisting}
+
+\subsection{StringHashMap 类定义}
+\lstset{morendkeywords={Pair}}
+\begin{lstlisting}[firstnumber=586, caption=StringHashMap 类定义]{}
+template<class Value>
+class StringHashMap {
+public:
+    typedef Pair<string, Value> MapPair; // 别名
+
+    StringHashMap() : ht(50) { }
+    // 委托调用
+    size_t size() const { return ht.bucketCount(); }
+    size_t maxSize() const { return ht.maxBucketNum(); }
+    bool empty() const { return ht.empty(); }
+    
+    inline Value &operator[](const string &s);
+    MapPair &find(const string &s) { return ht.find(s); }
+    const MapPair &find(const string &s) const { return ht.find(s); }
+    bool hasKey(const string &s) { return ht.hasKey(s); }
+    size_t erase(const string& key) { return ht.erase(key); }
+    void resize(size_t hint) { ht.resize(hint); }
+    inline void insert(const string& s, const Value& val);
+    inline void insert(const MapPair& pair);
+
+
+private:    // 用模板参数具体化 HashTable
+    HashTable<
+            MapPair,
+            string,
+            Hash<string>,
+            GetPairKey<MapPair, string>,
+            Equals<string> > ht;
+};
+\end{lstlisting}
+
+}
+
+
+\chapter{System 类}
+
+一个处理逻辑和与外界交互的封装类，存放学生信息并用上述结构完成了题目要求的功能。
+
+\subsection{System 类定义}
+\lstset{morendkeywords={Pair}}
+\begin{lstlisting}[firstnumber=986, caption=System 类定义]{}
+class System {
+    typedef LinkedList<Student>::Link Link;
+public:
+    enum Command { kQuit, kInsert, kDelete, kFind, kModify, kStatistic, kMenu };
+    System();
+    void run();
+
+protected:
+    static void menu(); // 展示目录
+    int readCommand();  // 读指令
+    void insert();      // 插入
+    void remove();      // 删除
+    void find();        // 查找
+    void modify();      // 修改
+    void statistic();   // 统计
+    void show(int option = 0);//显示
+    void statAdd(const Student &s);
+    void statSub(const Student &s);
+                        // 统计用
+    LinkedList<Student> list;
+    StringHashMap<Link> hashMap;
+    long long maleCnt = 0;
+    long long femaleCnt = 0;
+};
+\end{lstlisting}
+
+封装的具体代码涉及到许多繁琐的输入输出操作，这里不予展示，可以参照图\ref{add}、\ref{del}、\ref{find}、\ref{mod}的内容%
+理解其工作逻辑。

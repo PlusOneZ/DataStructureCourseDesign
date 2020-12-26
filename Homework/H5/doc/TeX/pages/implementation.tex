@@ -1,0 +1,310 @@
+
+\chapter{Queue 类}
+
+\section{API}
+
+\subsection{类定义}
+以下是本题使用队列的 API，各函数的功能已用注释标出。
+\begin{lstlisting}[morendkeywords={Queue}, firstnumber=9, caption=Queue 类定义]{}
+template <class Type>
+class Queue {
+    // 一个只含有基础 API 的循环队列，有自动扩充和缩小的功能
+public:
+    Queue();
+    ~Queue();
+
+    bool enqueue(const Type &d);          // 入队操作
+    bool dequeue(Type &d);                // 出队操作
+    bool peekFront(Type &d) const;        // 查看队首元素
+    bool isEmpty() const;                 // 队列是否为空
+    int  length() const;                  // 当前元素个数
+    void clear();                         // 清空
+    ostream &show(ostream &os) const;     // 打印队列元素
+
+private:
+    static constexpr int InitSize = 10;   // 初始大小
+    int size;                             // 当前元素个数
+    int capacity;                         // 当前容量
+    int front;                            // 队首
+    int rear;                             // 队尾
+    Type * data;                          // 元素数组
+
+    int resize(int n);                    // 重新分配
+    void tryExtend();                     // 扩张
+    void tryShrink();                     // 缩小
+};
+\end{lstlisting}
+\vspace*{1cm}
+
+{
+\lstset{
+    basicstyle=\ttfamily\color{CPPDark}, 
+    numberstyle=\tiny\color{darkgray},
+    keywordstyle=\color[RGB]{40,40,255},
+    }
+\subsection{公开成员}
+\begin{enumerate}
+    \item \lstinline{bool enqueue(const Type &d);} \\
+          入队。\lstinline{d} 是 \lstinline{Type} 类要入队的一个元素。正常情况返回 \lstinline{true}。
+    \item \lstinline{bool dequeue(Type &d)} \\
+          出队。\lstinline{d} 储存出队元素的值。如果队列为空返回 \lstinline{false}。
+    \item \lstinline{bool peekFront(Type &d) const;} \\
+          查看队首但不出队，\lstinline{d} 储存出队元素的值。如果队列为空返回 \lstinline{false}。\\
+    \item \lstinline{bool isEmpty() const;} \\
+          查看是否为空队，是的话返回 \lstinline{true}，否返回 \lstinline{false}。
+    \item \lstinline{int length() const;} \\
+          返回当前队列中的元素个数。\\
+    \item \lstinline{void clear();} \\
+          清空队列。清空后调用 \lstinline{length()} 应返回 0，调用 \lstinline{isEmpty()} 返回 \lstinline{true}。\\
+    \item \lstinline{std::ostream &show(std::ostream &os) const;} \\
+          从队头到队尾依次输出元素到 \lstinline{os}。\\
+\end{enumerate}
+
+\subsection{私有成员}
+\begin{enumerate}
+    \item \lstinline{Type * data;} \\
+          存放数据的数组，\lstinline{Type} 是范型的型别。
+    \item \lstinline{int size; int capacity; int front; int rear;} \\
+          分别是 \lstinline{data} 数组有效元素的个数、数组大小，队列之头的位置，队列之尾的位置。\\
+    \item \lstinline{int resize(int n);} \\
+          重新分配 \lstinline{data} 数组的大小。\lstinline{n} 比当前 \lstinline{size} 大的时候才会做这个动作。
+    \item \lstinline{void tryExtend();} \\
+          封装了“检查数组是否已满，若已满就扩大到两倍”的动作。
+    \item \lstinline{void tryShrink();} \\
+          封装了“检查数组是否过空（$1/4$ 容量），若过空就缩小一半”的动作。
+\end{enumerate}
+}
+
+\section{代码逻辑与实现}
+
+\subsection{逻辑描述}
+
+
+队列是一种操作受限的线性表，除了线性表中\emph{“只有一个直接前驱和一个直接后缀”}的限制之外，队列限制提供的接口保证：%
+\begin{inparaenum}
+      \item 只能在队列{\bfseries 队首 (\lstinline{front})} 删除元素；
+      \item 只能在队列{\bfseries 队尾 (\lstinline{rear})} 插入元素；
+      \item 只能查看队首的元素。
+\end{inparaenum}
+同线性表一样，队列的实现方式（按物理储存分类）也有两种：\emph{数组实现}和\emph{链表实现}。
+
+链表实现与栈相似，在此不赘述。本项目使用数组储存方式维护队列中的数据，使用的数组（像 \lstinline{Vector} 那样）具有重新分配内存空间的功能，%
+因此没有明确的元素个数上限。
+
+数组储存队列的方式没有{\kaishu 栈 (Stack)} 那么直观，问题出在需要在一端添加，另一端取出。如果每次从队首取出元素时都像 \lstinline{Vector} 那样%
+移动整个序列中的元素，那么开销将会过大。于是在这里使用了{\kaishu 循环队列 (Circular Queue)} 的设计。在循环队列中，维护了两个分别指向队首和队尾的%
+指针 \lstinline{front}、\lstinline{rear}，{\kaishu 出队 (Dequeue)} 时将 \lstinline{front} 指向的元素返回，并将 \lstinline{front} 后移一个单位；%
+{\kaishu 入队 (Enqueue)} 时将 \lstinline{rear} 指向的数据置为插入元素，并将 \lstinline{rear} 后移一个单位。%
+
+{\kaishu “循环”} 这一概念的主要在于\emph{后移一个单位}的操作中。在有限的数组内，由于出队操作造成队列前部分可能有空间放下新元素，%
+因此当一个指针想要向后移动一个单位时，如果已经达到数组的结尾，可以考虑前移到数列开头看看有没有可用的空间，我们称之{\kaishu 循环}。%
+对于插入操作，后移和循环时要保证下一位置是一个空位。下图是循环队列操作的一个案例。
+
+
+\begin{figure}[H]
+      \centering
+      \tikzstyle{c} = [minimum width = 8mm, minimum height = 10mm]
+      \tikzstyle{token} = [draw = white, node distance = 1.2cm]
+      \tikzstyle{arr} = [thick, ->]
+\begin{tikzpicture}[every node/.style={draw}]
+      \matrix (m1) [draw=white]
+      {
+            \node [c](1){1}; & \node [c](2){2}; & \node [c](3){3}; & \node [c](4){4}; & 
+            \node [c](5){5}; & \node [c](6){6}; & \node [c](7){7}; & \node [c](8){ };\\
+      };
+      
+      \node (f1)[token, above of = 1]{front};
+      \node (r1)[token, above of = 7]{rear};
+      \draw [arr] (f1) -- (1);
+      \draw [arr] (r1) -- (7);
+      
+      \matrix (m2) [draw=white, below of = m1, node distance = 2.3cm]
+      {
+            \node [c](21){1}; & \node [c](22){2}; & \node [c](23){3}; & \node [c](24){4}; & 
+            \node [c](25){5}; & \node [c](26){6}; & \node [c](27){7}; & \node [c](28){8};\\
+      };
+      
+      \node (f2)[token, above of = 21]{front};
+      \node (r2)[token, above of = 28]{rear};
+      \draw [arr] (f2) -- (21);
+      \draw [arr] (r2) -- (28);
+      
+      \matrix (m3) [draw=white, below of = m2, node distance = 2.3cm]
+      {
+            \node [c](31){ }; & \node [c](32){ }; & \node [c](33){3}; & \node [c](34){4}; & 
+            \node [c](35){5}; & \node [c](36){6}; & \node [c](37){7}; & \node [c](38){8};\\
+      };
+      
+      \node (f3)[token, above of = 33]{front};
+      \node (r3)[token, above of = 38]{rear};
+      \draw [arr] (f3) -- (33);
+      \draw [arr] (r3) -- (38);
+
+      \matrix (m4) [draw=white, below of = m3, node distance = 2.3cm]
+      {
+            \node [c](41){9}; & \node [c](42){ }; & \node [c](43){3}; & \node [c](44){4}; & 
+            \node [c](45){5}; & \node [c](46){6}; & \node [c](47){7}; & \node [c](48){8};\\
+      };
+      
+      \node (f4)[token, above of = 43]{front};
+      \node (r4)[token, above of = 41]{rear};
+      \draw [arr] (f4) -- (43);
+      \draw [arr] (r4) -- (41);
+
+
+\end{tikzpicture}
+\caption{循环队列内部数据示意图\\}
+\end{figure}
+
+
+\subsection{代码实现}
+
+{
+\lstset{
+      morendkeywords={Queue},
+      morendkeywords = {size, capacity, front, rear, data}
+}
+\begin{enumerate}
+      \item 入队
+\begin{lstlisting} [firstnumber = 47, caption={Queue::enqueue}]
+template<class Type>
+bool Queue<Type>::enqueue(const Type &d) {
+    tryExtend();                    // 保证有足够的空间
+    data[rear] = d;
+    rear = (rear+1) % capacity;     // 指针循环
+    ++size;
+    return true;
+} \end{lstlisting}
+      \item 出队
+\begin{lstlisting} [firstnumber = 47, caption={Queue::dequeue}]
+template<class Type>
+bool Queue<Type>::dequeue(Type &d) {
+    if (isEmpty())                  // 不能为空
+        return false;
+    d = data[front];
+    front = (front+1) % capacity;   // 指针循环
+    --size;
+    tryShrink();                    // 尝试缩小空间
+    return true;
+}\end{lstlisting}
+      \item 重分配空间。不允许数据丢失，重分配后将数据按顺序整理到开头。
+\begin{lstlisting} [firstnumber = 85, caption={Queue::resize}]     
+bool Queue<Type>::resize(int n) {
+    if (n < size) {
+        return false;               // 不允许数据丢失
+    }
+    if (n == capacity) {
+        return true;                // 相等就不用分配
+    }
+    auto temp = new Type[n];        
+    if (!isEmpty()) {               // 整理数据
+        int j = 0;
+        for (int i = front; i != rear; i = (i+1)%capacity) {
+            temp[j++] = data[i];
+        }
+    }
+    capacity = n; front = 0;
+    rear = size;
+    delete [] data; data = temp;
+    return true;
+} \end{lstlisting}
+      \item 扩张数组：在数组将满的时候调用 \lstinline{resize}
+\begin{lstlisting} [firstnumber = 109]
+template<class Type>
+void Queue<Type>::tryExtend() {
+    if (capacity - size <= 1)       // 只剩一个空位
+        resize(capacity * 2);       // 扩张到两倍
+} \end{lstlisting}
+      \item 缩小数组：在只有 $1/4$ 空间被有效利用时，尝试将数组缩减到一半大小。
+\begin{lstlisting} [firstnumber = 116]
+template<class Type>
+void Queue<Type>::tryShrink() {
+    if (isEmpty())                  // 空队恢复初始大小
+        resize(InitSize);           
+    else if (capacity > InitSize && capacity / 4 > size)
+        resize(capacity / 2);       // 缩减大小
+}
+\end{lstlisting}
+\end{enumerate}
+}
+
+\chapter{Bank 类}
+
+封装了本题逻辑功能的一个类。
+
+\section{API}
+
+\subsection{类定义}
+{
+\lstset{morendkeywords={Bank}}
+\begin{lstlisting}[firstnumber=154, caption=Bank 类定义]{}
+class Bank {
+public:
+    explicit Bank(std::ostream& os) : ostream(os) { };
+    ~Bank() = default;
+    void addBusiness(const string& num);// 将 num 入队
+    void handleBusiness();              // 决定顺序并出队
+    void run(int num, std::istream &is);// 完成一题
+
+private:
+    Queue<string> windowA;
+    Queue<string> windowB;
+    std::ostream& ostream;
+
+    enum Window { A, B };
+    void handle(Window w);              // 出队的实际操作
+    static bool isNumeric(const string& num);
+                                        // 检查字符串
+};
+\end{lstlisting}
+
+
+\subsection{代码实现}
+
+\lstinline{Bank} 类最主要的功能就是封装了两个队列来完成操作，具体的逻辑与图\ref{yewu}一致，下面展示关键代码。
+
+\begin{itemize}
+      \item \lstinline{void Bank::addBusiness(long long num)} \\
+            将一个数加入到 \textsl{A} 或 \textsl{B} 窗口的队列中。
+\begin{lstlisting}[escapechar=^,]
+void Bank::addBusiness(const string& num) {
+    if (!isNumeric(num))
+        throw BankException("Invalid character!"); ^\label{throw}^
+    if ((num[num.length()-1] - '0') % 2) {
+        windowA.enqueue(num);
+    } else {
+        windowB.enqueue(num);
+    }
+}
+\end{lstlisting}
+      \item \lstinline{void Bank::handleBusiness()}\\
+            挨个处理这些业务直到结束。
+\begin{lstlisting}
+void Bank::handleBusiness() {
+    while (!(windowA.isEmpty() && windowB.isEmpty())) {
+        handle(A);
+        handle(A);
+        handle(B);
+    }
+    ostream << std::endl;
+}
+\end{lstlisting}
+      \item \lstinline{Bank::handle(Bank::Window w)}\\
+            处理业务的实际函数，参数化来实现封装。
+\begin{lstlisting}
+void Bank::handle(Bank::Window w) {
+    string m;
+    if (w == A) {
+        if (windowA.dequeue(m)) {
+            ostream << m << ' ';
+        }
+    } else {
+        if (windowB.dequeue(m)) {
+            ostream << m << ' ';
+        }
+    }
+}
+\end{lstlisting}
+\end{itemize}
+
+}

@@ -1,0 +1,86 @@
+% Chapter 1
+
+\chapter{选项说明}
+本模板基于 \lstinline{book} 的衍生文档类 \lstinline{ctexbook} 定制，所以 \lstinline{ctex} 宏集的选项与命令同样适用。适合排版笔记、中长篇书籍的中英文混排，亦或是纯英文文档。设置了\textsf{部分}级别，可以根据需要选用。选项有布尔式与序列式两种，由 \lstinline{kvoptions} 宏包配置。本模板可任意修改或复制，但请勿用于商业用途。
+
+\section{字体}
+中文字体使用{\songti 方正书宋}、{\heiti 方正黑体}、{\kaishu 方正楷体}和{\fangsong 方正仿宋}四款字体。英文使用思源系列字体，正文字体为{\fontspec{Noto Serif Regular}Noto Serif Regular}，无衬线字体为{\fontspec{Noto Sans Regular}Noto Sans Regular}，等宽字体为{\fontspec{Noto Sans Mono Regular}Noto Sans Mono Regular}。以上字体均为开源免费字体\href{https://wws.lanzous.com/b01ns361i}{下载地址}。数学字体使用 \lstinline{txfonts} 宏包设置为times风格。
+
+正文字号大小暂时可以设置为小四号与五号（默认），设置方式为 \lstinline{zihao=-4} 与 \lstinline{zihao=5}。并且对{\heiti 方正黑体}、{\songti 方正书宋}和{\fontspec{Noto Sans Regular}Noto Sans Regular}字体设置了伪粗，可根据需要进行加粗。
+
+正文使用选项 \lstinline{nofont}（不设置字体，默认为关）\marginnote{布尔式}，并在导言区设置\footnote{中文以中易字库为例}
+\begin{lstlisting}[numbers=none]
+\setmainfont{Times New Roman}
+\setsansfont{Arial}
+\setmonofont{Consolas}
+\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi]
+\setCJKsansfont{SimHei}
+\setCJKmonofont{FangSong}
+\newCJKfontfamily[songti]\songti{SimSun}
+\newCJKfontfamily[heiti]\heiti{SimHei}
+\newCJKfontfamily[kaishu]\kaishu{KaiTi}
+\newCJKfontfamily[fangsong]\fangsong{FangSong}
+\end{lstlisting}
+
+可以使用 \lstinline{unicode-math} 宏包可以调用 \lstinline{Unicode} 数学字体配置数学公式的字体风格，此处不多介绍。
+
+\section{标题样式}
+部分标题及章标题默认为中文数字编号\marginnote{布尔式}，形式如\textsf{第一部分、第一章}。可以使用 \lstinline{entitle} 选项设为英文类编号，形式如\textsf{第I部分、第1章}。
+
+\lstinline{withpart} 选项使\textsf{章}跟随\textsf{部分}编号，默认不跟随，但此时\textsf{脚注}跟随\textsf{章}编号。\lstinline{withchap} 选项使\textsf{脚注}跟随\textsf{章}编号，默认跟随\textsf{部分}编号。
+
+标题默认均为悬挂缩进样式，但在开启英文模式时，使用 \lstinline{newline} 选项可以使\textsf{部分}和\textsf{章}的标题另起一行，符合英文的习惯并接近原生样式。
+
+\section{版面}
+纸张可以设置为A4或B5版面大小\marginnote{序列式}，默认为A4大小，选项为 \lstinline{a4} 与 \lstinline{b5}。建议 \lstinline{a4} 与 \lstinline{zihao=-4}，\lstinline{b5} 与 \lstinline{zihao=5} 配合设置。\lstinline{book} 文类默认新的一章从奇数页开始并双面打印，这可能会造成空白。使用 \lstinline{openany} 选项可以从任意页开始，使用 \lstinline{oneside} 选项可以单面打印。
+以下两种选项设置方式等效
+\begin{lstlisting}[numbers=none]
+geometry=a4
+geometry=b5
+a4
+b5
+\end{lstlisting}
+
+模板可以单栏排版（默认）或是双栏排版，当选用 \lstinline{onecolumn} 时为单栏排版，当选用 \lstinline{twocolumn} 时为双栏排版。本文基于单栏布置内容，直接切换为双栏会存在段落溢出等问题。
+
+\section{颜色主题}
+本模板提供 \textsf{\textcolor{frame}{seagreen}} 和 \textsf{\textcolor{black}{black}}（默认）两个颜色主题选项\marginnote{序列式}，如需其他颜色可在格式文件对 \lstinline{\definecolor} 命令重新设置。取消超链接的颜色可在导言区设置
+\begin{lstlisting}[numbers=none]
+\hypersetup{hidelinks}
+\end{lstlisting}
+以下两种选项设置方式等效
+\begin{lstlisting}[numbers=none]
+color=black
+color=seagreen
+black
+seagreen
+\end{lstlisting}
+
+\section{参考文献格式}
+参考文献格式为中国的参考文献推荐标准GB/T 7714-2015\marginnote{序列式}，有顺序编码制和著者-出版年制两种风格，选项分别为 \lstinline{number} 和 \lstinline{authoryear}。理工科类一般使用顺序编码制，文科类一般使用著者-出版年制，默认为顺序编码制。以下两种选项设置方式等效
+\begin{lstlisting}[numbers=none]
+cite=number
+cite=authoryear
+number
+authoryear
+\end{lstlisting}
+
+\section{草稿标记}
+\lstinline{draftmark} 选项会在页脚添加未定稿标记与当前日期（默认为关）\marginnote{布尔式}，导言区设置 \lstinline{draftmark} 等同于 \lstinline{draftmark=true}。
+
+\section{目录分栏}
+无论是单栏排版还是双栏排版的时候目录样式均默认为单栏\marginnote{布尔式}，但是也可以设置单栏或双栏排版时目录为双栏，也就是说有四种组合方式。\lstinline{multoc} 选项将会开启双栏目录，它的参数取值默认为假。
+\begin{lstlisting}[numbers=none]
+onecolumn   % 单栏正文，单栏目录
+twocolumn   % 双栏正文，单栏目录
+onecolumn,multoc   % 单栏正文，双栏目录
+twocolumn,multoc   % 双栏正文，双栏目录
+\end{lstlisting}
+
+\section{语言}
+本模板支持中英文语言\marginnote{布尔式}，\textsf{并且在英文模式下兼容中文的输入}。选项 \lstinline{chinese} 开启中文，选项 \lstinline{english} 开启英文，区别在于英文模式下图表定理等标签会变为英文，其他不受影响。但须注意需配合使用 \lstinline{entitle} 选项使\textsf{部分}和\textsf{章}的编号变为阿拉伯数字。同时定义了一个选项 \lstinline{enroco} 会开启英文模式并且标题样式自动符合英文习惯。
+
+\section{短文模式}
+使用 \lstinline{article} 选项开启短文模式\marginnote{布尔式}，此时不需要使用 \lstinline{\chapter} 命令，图、表、公式和代码全文编号，其他部分未适配。
+
+\vfill{\small\doclicenseThis}

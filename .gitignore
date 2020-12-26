@@ -1,0 +1,4 @@
+/tests/*
+/.idea/*
+*.pdf
+/cmake-build-debug/*
