@@ -16,7 +16,7 @@
 \section{API}
 
 \subsection{类定义}
-以下是本题使用队列的 API，各函数的功能已用注释标出。
+以下是本题使用链表的 API，各函数的功能已用注释标出。
 \begin{lstlisting}[morendkeywords={LinkedList}, firstnumber=637, caption=LinkedList 类定义]{}
 template<class Type>
 class LinkedList {
@@ -85,8 +85,8 @@ protected:
           对每个元素都调用操作 \lstinline{op}，可以用于格式打印等操作。
     \item \lstinline{void clear();} \\
           清空链表，只留下头节点。
-          Cursor getCursor();
     \item \lstinline{Cursor getCursor();} \\
+	  获取一个指向第一个数据节点的光标对象。
 \end{enumerate}
 
 \subsection{私有成员}
@@ -223,7 +223,7 @@ bool BigInteger::operator==(const BigInteger &other) const {
 
 此外，因为用字符串存放数值，就不能让其他字符进入大整型的数据中，因此需要实现一个检查函数，也就是 \lstinline{stringcheck (const string &s)}。
 
-\begin{lstlisting}[firstnumber=301, caption="\lstinline{check} 函数实现"]
+\begin{lstlisting}[firstnumber=301, caption=\lstinline{check} 函数实现]
 std::string BigInteger::check(const std::string &s) {
     if (s == "-1") return s;
     int headZeros = 0;

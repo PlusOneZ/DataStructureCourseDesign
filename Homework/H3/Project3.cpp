@@ -1,6 +1,8 @@
 #include <iostream>
 #include <exception>
 
+
+///------------------------------- Stack ------------------------------------///
 class PeekingEmptyError : public std::exception {
     const char *what() const _NOEXCEPT override {
         return "Cannot peek empty stack";
@@ -14,40 +16,35 @@ class Stack {
         Type data;
 
         explicit Node(const Type &d) : data(d) {}
-
         Node() = default;
     };
 
 public:
     Stack();
-
     ~Stack();
 
     const Type &peek() const;
-
     bool pop();
-
     void push(const Type &d);
 
     void clear();
-
     bool isEmpty() const;
 
     bool show(std::ostream &os, const std::string &sep) const;
 
 protected:
-    Node *_head = nullptr;
+    Node *head = nullptr;
 };
 
 template<class Type>
 Stack<Type>::Stack() {
-    _head = new Node();
-    _head->next = nullptr;
+    head = new Node();
+    head->next = nullptr;
 }
 
 template<class Type>
 Stack<Type>::~Stack() {
-    Node *p = _head;
+    Node *p = head;
     Node *q;
     while (p != nullptr) {
         q = p->next;
@@ -59,19 +56,19 @@ Stack<Type>::~Stack() {
 template<class Type>
 void Stack<Type>::clear() {
     if (isEmpty()) return;
-    Node *p = _head->next;
+    Node *p = head->next;
     Node *q;
     while (p->next != nullptr) {
         q = p->next;
         delete p;
         p = q;
     }
-    _head = p;
+    head = p;
 }
 
 template<class Type>
 bool Stack<Type>::isEmpty() const {
-    return _head->next == nullptr;
+    return head->next == nullptr;
 }
 
 template<class Type>
@@ -79,7 +76,7 @@ const Type &Stack<Type>::peek() const {
     if (isEmpty()) {
         throw PeekingEmptyError();
     }
-    return _head->next->data;
+    return head->next->data;
 }
 
 template<class Type>
@@ -87,8 +84,8 @@ bool Stack<Type>::pop() {
     if (isEmpty()) {
         return false;
     }
-    Node *p = _head->next;
-    _head->next = p->next;
+    Node *p = head->next;
+    head->next = p->next;
     delete p;
     return true;
 }
@@ -96,13 +93,13 @@ bool Stack<Type>::pop() {
 template<class Type>
 void Stack<Type>::push(const Type &d) {
     auto nNode = new Node(d);
-    nNode->next = _head->next;
-    _head->next = nNode;
+    nNode->next = head->next;
+    head->next = nNode;
 }
 
 template<class Type>
 bool Stack<Type>::show(std::ostream &os, const std::string &sep) const {
-    auto p = _head;
+    auto p = head;
     if (p->next == nullptr)
         return false;
     p = p->next;
@@ -110,7 +107,7 @@ bool Stack<Type>::show(std::ostream &os, const std::string &sep) const {
     while (p->next != nullptr) {
         os << p->data << " " << sep << " ";
         p = p->next;
-        if (counter++ % 8 == 0) {
+        if (counter++ % 5 == 0) {
             os << '\n';
         }
     }
@@ -119,8 +116,7 @@ bool Stack<Type>::show(std::ostream &os, const std::string &sep) const {
 }
 
 
-
-///-----------------------------------------------------------------------------
+///---------------------------------- Maze ----------------------------------///
 
 class MazeOutOfRangeError : public std::exception {
     const char *what() const _NOEXCEPT override {
@@ -137,22 +133,17 @@ public:
             coordinate[0] = x;
             coordinate[1] = y;
         }
-
         Position() = default;
 
         std::ostream &show(std::ostream &os) {
             os << "<" << coordinate[0] << "," << coordinate[1] << ">";
             return os;
         }
-
         int x() const { return coordinate[0]; }
-
         int y() const { return coordinate[1]; }
     };
 
-    Maze() : start(1, 16) {
-
-    }
+    Maze() : start(1, 16) { }
 
     void run() {
         clearAllTraversed();
@@ -168,7 +159,6 @@ public:
             std::cout << "No way out!\n";
         }
     }
-
 
 protected:
     static constexpr int width = 100;
@@ -255,24 +245,6 @@ protected:
     }
 
     bool DeepFirstSearch(const Position &position) {
-//        traversed[position.x()][position.y()] = true;
-//        if (getPos(position) == '1') {
-//            route.push(position);
-//            return true;
-//        }
-//        for (auto &d : directions) {
-//            int x_new = position.x() + d[0];
-//            int y_new = position.y() + d[1];
-//
-//            if (traversed[x_new][y_new] || getPos(x_new, y_new) == '#') {
-//                continue;
-//            }
-//            if (DeepFirstSearch(Position(x_new, y_new))) {
-//                route.push(position);
-//                return true;
-//            }
-//        }
-//        return false;
         Position curPos = start;
         if (checkValid(curPos)) {
             route.push(curPos);
@@ -305,11 +277,9 @@ protected:
                 }
                 curPos = route.peek();
             }
-//            std::cout << curPos.x() << "  " << curPos.y() << "  " << canForward <<"\n";
         }
         return !route.isEmpty();
     }
-
 };
 
 std::ostream &operator<<(std::ostream &os, Maze::Position &p) {

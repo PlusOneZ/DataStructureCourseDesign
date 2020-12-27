@@ -1,10 +1,10 @@
-This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020) (preloaded format=xelatex 2020.10.1)  27 DEC 2020 08:50
+This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020) (preloaded format=xelatex 2020.10.1)  27 DEC 2020 12:22
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/plusone/Desktop/Coding/CPP/DataStructure/Homework/H2/doc/TeX/proj2
-(/Users/plusone/Desktop/Coding/CPP/DataStructure/Homework/H2/doc/TeX/proj2.tex
+**/Users/plusone/Desktop/Coding/CPP/DataStructure/Homework/H3/doc/TeX/proj3
+(/Users/plusone/Desktop/Coding/CPP/DataStructure/Homework/H3/doc/TeX/proj3.tex
 LaTeX2e <2020-02-02> patch level 5
 L3 programming layer <2020-03-06> (./ibook.cls
 Document Class: ibook 2020/12/04 v2.01
@@ -1451,11 +1451,11 @@ Package: multicol 2019/12/09 v1.8y multicolumn formatting (FMi)
 \colbreak@box=\box141
 \mc@col@check@num=\count389
 ))
-\proj2@idxfile=\write4
-\openout4 = `proj2.idx'.
+\proj3@idxfile=\write4
+\openout4 = `proj3.idx'.
 
 
-Writing index file proj2.idx
+Writing index file proj3.idx
 (/usr/local/texlive/2020/texmf-dist/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2020/01/14 v7.00d Hypertext links for LaTeX
  (/usr/local/texlive/2020/texmf-dist/tex/generic/pdfescape/pdfescape.sty
@@ -1826,8 +1826,8 @@ Package csquotes Info: ... configuration file loaded successfully.
 File: csquotes.cfg 
 )) (/usr/local/texlive/2020/texmf-dist/tex/latex/ccicons/ccicons.sty
 Package: ccicons 2017/10/30 v1.6 LaTeX support for Creative Commons icons
-) (./proj2.aux (./pages/design.aux) (./pages/implementation.aux) (./pages/tests.aux))
-\openout1 = `proj2.aux'.
+) (./proj3.aux (./pages/design.aux) (./pages/implementation.aux) (./pages/tests.aux))
+\openout1 = `proj3.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 51.
 LaTeX Font Info:    Trying to load font information for OML+txmi on input line 51.
@@ -2003,7 +2003,10 @@ Package fontspec Info: Font family 'NotoSansHans-Regular(0)' created for font
 (fontspec)             <->"NotoSansHans-Regular/BI/OT:script=hani;language=dflt;"
 (fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.: 
 
- (./proj2.toc
+ (./proj3.toc)
+\tf@toc=\write5
+\openout5 = `proj3.toc'.
+
 
 Package fontspec Info: Could not resolve font "FZKTJW--GB1-0/BI" (it probably
 (fontspec)             doesn't exist).
@@ -2031,13 +2034,10 @@ Package fontspec Info: Font family 'FZKTJW--GB1-0(0)' created for font
 
 
 
-])
-\tf@toc=\write5
-\openout5 = `proj2.toc'.
-
- [2] [1
+] [2
 
 
+] [1
 
 ]
 \openout2 = `pages/design.aux'.
@@ -2049,6 +2049,42 @@ Package fontspec Info: Font family 'FZKTJW--GB1-0(0)' created for font
 
 ]
 第二章
+[3
+
+]
+
+Package fontspec Info: Font family 'DejaVuSansMonoforPowerline(0)' created for
+(fontspec)             font 'DejaVu Sans Mono for Powerline' with options [].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.: <->"DejaVu Sans Mono
+(fontspec)             for Powerline/OT:script=latn;language=dflt;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             - 'bold' (b/n) with NFSS spec.: <->"DejaVu Sans Mono
+(fontspec)             for Powerline/B/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
+(fontspec)             - 'italic' (m/it) with NFSS spec.: <->"DejaVu Sans Mono
+(fontspec)             for Powerline/I/OT:script=latn;language=dflt;"
+(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.: 
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.: <->"DejaVu Sans
+(fontspec)             Mono for Powerline/BI/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.: 
+
+) [4] [5
+
+
+]
+\openout2 = `pages/implementation.aux'.
+
+ (./pages/implementation.tex
+第三章
+[6
+
+
+]
+第四章
 
 Package fontspec Info: Could not resolve font "FZFSJW--GB1-0/BI" (it probably
 (fontspec)             doesn't exist).
@@ -2072,71 +2108,13 @@ Package fontspec Info: Font family 'FZFSJW--GB1-0(0)' created for font
 (fontspec)             <->"FZFSJW--GB1-0/OT:script=hani;language=dflt;"
 (fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
 
-
-Package fontspec Info: Font family 'DejaVuSansMonoforPowerline(0)' created for
-(fontspec)             font 'DejaVu Sans Mono for Powerline' with options [].
-(fontspec)              
-(fontspec)              This font family consists of the following NFSS
-(fontspec)             series/shapes:
-(fontspec)              
-(fontspec)             - 'normal' (m/n) with NFSS spec.: <->"DejaVu Sans Mono
-(fontspec)             for Powerline/OT:script=latn;language=dflt;"
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
-(fontspec)             - 'bold' (b/n) with NFSS spec.: <->"DejaVu Sans Mono
-(fontspec)             for Powerline/B/OT:script=latn;language=dflt;"
-(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
-(fontspec)             - 'italic' (m/it) with NFSS spec.: <->"DejaVu Sans Mono
-(fontspec)             for Powerline/I/OT:script=latn;language=dflt;"
-(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.: 
-(fontspec)             - 'bold italic' (b/it) with NFSS spec.: <->"DejaVu Sans
-(fontspec)             Mono for Powerline/BI/OT:script=latn;language=dflt;"
-(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.: 
-
-[3
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 122--123
-
- []
-
-
-Underfull \vbox (badness 3240) has occurred while \output is active []
-
- [4]) [5] [6
-
-
-]
-\openout2 = `pages/implementation.aux'.
-
- (./pages/implementation.tex
-第三章
 [7
 
-
-]
-第四章
-[8
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 89--90
-
- []
-
-[9] [10] [11]
+] [8]
 第五章
+[9
 
-Underfull \hbox (badness 10000) in paragraph at lines 199--200
-
- []
-
-[12
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 212--213
-
- []
-
-) [13] [14
+] [10]) [11] [12
 
 
 ]
@@ -2144,7 +2122,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 212--213
 
  (./pages/tests.tex
 第六章
-[15
+[13
 
 
 ]
@@ -2153,39 +2131,43 @@ Underfull \hbox (badness 10000) in paragraph at lines 212--213
 File: lstlang1.sty 2020/03/24 1.8d listings language file
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
-) [16
+) [14
 
-]) [17] (./proj2.lol)
+]) [15] (./proj3.lol)
 \tf@lol=\write6
-\openout6 = `proj2.lol'.
+\openout6 = `proj3.lol'.
 
- [18
+ [16
 
 
 
-] (./proj2.lof)
+] (./proj3.lof)
 \tf@lof=\write7
-\openout7 = `proj2.lof'.
+\openout7 = `proj3.lof'.
 
- [19
+ [17
 
 ]
-runsystem(makeindex proj2.idx)...executed safely (allowed).
+runsystem(makeindex proj3.idx)...executed safely (allowed).
 
- (./proj2.ind)
+ (./proj3.ind)
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 70.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 70.
- (./proj2.aux (./pages/design.aux) (./pages/implementation.aux) (./pages/tests.aux))
+ (./proj3.aux (./pages/design.aux) (./pages/implementation.aux) (./pages/tests.aux))
 Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 70.
 Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 70.
- ) 
-Here is how much of TeX's memory you used:
- 57113 strings out of 479418
- 1313289 string characters out of 5884585
- 2042826 words of memory out of 5000000
- 73554 multiletter control sequences out of 15000+600000
- 546236 words of font info for 142 fonts, out of 8000000 for 9000
- 1348 hyphenation exceptions out of 8191
- 68i,12n,126p,923b,2543s stack positions out of 5000i,500n,10000p,200000b,80000s
+ )
+(\end occurred inside a group at level 1)
 
-Output written on proj2.pdf (21 pages).
+### simple group (level 1) entered at line 111 ({)
+### bottom level 
+Here is how much of TeX's memory you used:
+ 57243 strings out of 479418
+ 1319585 string characters out of 5884585
+ 2052136 words of memory out of 5000000
+ 73687 multiletter control sequences out of 15000+600000
+ 546212 words of font info for 139 fonts, out of 8000000 for 9000
+ 1348 hyphenation exceptions out of 8191
+ 68i,14n,126p,923b,2417s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on proj3.pdf (19 pages).

@@ -1,0 +1,220 @@
+
+\chapter{类结构}
+本项目使用了{\kaishu 链式栈(\lstinline{Stack})}和{\kaishu 迷宫(\lstinline{Maze})}两个类型。%
+在迷宫类型中封装了深度优先搜索寻路的实现、迷宫和路径；其中路径的存储用的是链式栈。
+
+\begin{itemize}
+    \item \lstinline{Stack} 类\\
+    链式栈，可以在尾后插入、删除。
+    \item \lstinline{Maze} 类\\
+    维护迷宫数组、路径、访问状态数组，实现了打印、寻路、交互功能。
+\end{itemize}
+
+
+\chapter{Stack 类}
+
+\section{API}
+
+\subsection{类定义}
+以下是本题使用链式栈的 API，各函数的功能已用注释标出。
+\begin{lstlisting}[morendkeywords={LinkedList}, firstnumber=637, caption=LinkedList 类定义]{}
+template<class Type>
+class Stack {
+    struct Node {  // 内部节点类
+        Node *next = nullptr;
+        Type data;
+
+        explicit Node(const Type &d) : data(d) {}
+        Node() = default;
+    };
+
+public:
+    Stack();
+    ~Stack();
+
+    const Type &peek() const; // 栈顶元素
+    bool pop();               // 弹出
+    void push(const Type &d); // 压入
+
+    void clear();             // 清除
+    bool isEmpty() const;     // 判空
+
+    bool show(std::ostream &os, const std::string &sep) const;
+
+protected:
+    Node *head = nullptr;
+};
+\end{lstlisting}
+
+{
+\lstset{
+    basicstyle=\ttfamily\color{CPPDark}, 
+    numberstyle=\tiny\color{darkgray},
+    keywordstyle=\color[RGB]{40,40,255},
+    }
+\subsection{公开成员}
+\begin{enumerate}
+    \item \lstinline{const Type &peek() const;}\\
+          返回栈顶的元素，但不删除，只是{\kaishu 看一眼}。
+    \item \lstinline{bool pop();} \\
+          弹出栈顶元素，返回值表示成功或失败。
+    \item \lstinline{void push(const Type &d);} \\
+          用 $d$ 创建一个新节点并压入栈中。
+    \item \lstinline{void clear();} \\
+          清空栈内所有元素。
+    \item \lstinline{bool show(ostream &os, const string &sep) const;} \\
+          打印栈中所有元素（按入栈顺序），并用 \lstinline{sep} 隔开。
+\end{enumerate}
+
+}
+
+\section{代码逻辑与实现}
+
+
+{
+\lstset{
+      morendkeywords={Stack},
+      morendkeywords = {head}
+}
+\begin{enumerate}
+      \item 压入栈中
+\begin{lstlisting} [firstnumber = 93, caption={Stack::push}]
+template<class Type>
+void Stack<Type>::push(const Type &d) {
+    auto nNode = new Node(d);
+    nNode->next = head->next;
+    head->next = nNode;
+} \end{lstlisting}
+      \item 弹出
+\begin{lstlisting} [firstnumber = 82, caption={Stack::pop}]
+template<class Type>
+bool Stack<Type>::pop() {
+    if (isEmpty()) {
+        return false;
+    }
+    Node *p = head->next;
+    head->next = p->next;
+    delete p;
+    return true;
+}\end{lstlisting}
+       
+\end{enumerate}
+}
+
+\chapter{Maze 类}
+
+功能封装。
+
+\section{API}
+
+以下是 \lstinline{Maze} 类的类定义。
+{
+\lstset{morendkeywords={Maze}}
+\begin{lstlisting}[firstnumber=121, caption=Maze 类定义]{}
+class Maze {
+public:
+    class Position {
+        int coordinate[2] = {0, 0};
+    public:
+        Position(int x, int y) {...}
+        Position() = default;
+
+        std::ostream &show(std::ostream &os) {...}
+        int x() const { return coordinate[0]; }
+        int y() const { return coordinate[1]; }
+    };
+
+    Maze() : start(1, 16) { }
+
+    void run() {...}
+
+protected:
+    static constexpr int width = 100;
+    static constexpr int height = 100;
+
+    char maze[height][width] = {
+            "####################",
+            "#1#..#.#..#.#..#0..#",
+            "#.#.#...#...#.####.#",
+            "#...###.##.#..##.#.#",
+            "###...#....##....#.#",
+            "#...######..#...#..#",
+            "#.###......#..##..##",
+            "#..##.#####..##..###",
+            "##..#..####.##..####",
+            "###...####.....##..#",
+            "#.##.####..###..##.#",
+            "#.##....##..##.##..#",
+            "#..####....###..#..#",
+            "##......#######...##",
+            "####################",
+    };
+    enum Token { Unvisited, ToBeMarked, BadWay };
+    Token traversed[height][width] = { Unvisited };
+
+    Position start;
+    Stack<Position> route;
+    Stack<int> routeSequence;
+    int directions[4][2] = {{-1, 0},
+                            {1,  0},
+                            {0,  1},
+                            {0,  -1}
+    };
+
+    void showMaze() {...}
+    void modifyMaze() {...}
+    char &getPos(int x, int y) {...}
+    char &getPos(const Position &pos) {...}
+    void clearAllTraversed() {...}
+    bool checkValid(const Position &pos) {...}
+    bool isDestination(const Position &pos) {...}
+    bool DeepFirstSearch(const Position &position) {...}
+};  
+\end{lstlisting}
+
+
+\section{实现}
+
+从API中可以卡出，本项目的迷宫写在了代码里，修改迷宫的内容可以直接进入代码并编译。但是本题的接口并不仅限于代码中给出的迷宫，%
+修改迷宫可以改变代码输出，且如果没有路径会给出相应提示。
+
+迷宫类的实现重点在于 \lstinline{DeepFirstSearch} 函数的实现：
+
+\begin{lstlisting} [firstnumber = 247]
+bool DeepFirstSearch(const Position &position) {
+    Position curPos = start;
+    if (checkValid(curPos)) {
+        route.push(curPos);
+    } else {
+        return false;
+    }
+    bool canForward;    // 记录是否前进
+    while (true) {
+        if (isDestination(curPos)) {
+            break;
+        }
+        canForward = false;
+        for (const auto &d : directions) {
+            int x_new = curPos.x() + d[0];
+            int y_new = curPos.y() + d[1];
+            // 前进
+            if (checkValid(Position(x_new, y_new))) {
+                canForward = true;
+                traversed[curPos.x()][curPos.y()] = ToBeMarked;
+                curPos = Position(x_new, y_new);
+                route.push(curPos);
+                break;
+            }
+        }
+        if (!canForward) { // 标为死路后退
+            traversed[curPos.x()][curPos.y()] = BadWay;
+            route.pop();
+            if (route.isEmpty()) {
+                return false;
+            }
+            curPos = route.peek();
+        }
+    }
+    return !route.isEmpty();
+}
+\end{lstlisting}
