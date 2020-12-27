@@ -15,8 +15,8 @@ add_executable(DataStructure
 
 #        Homework/H1/Project1.cpp
 #        Homework/H2/Project2.cpp
-        Homework/H3/Project3.cpp
-#        Homework/H4/Project4.cpp
+#        Homework/H3/Project3.cpp
+        Homework/H4/Project4.cpp
 #        Homework/H5/Project5.cpp
 #        Homework/H6/Project6.cpp
 #        Homework/H7/Project7.cpp

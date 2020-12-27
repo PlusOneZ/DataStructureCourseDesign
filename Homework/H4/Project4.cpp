@@ -1,6 +1,4 @@
-//
-// Created by Zhengyi on 2020/11/17.
-//
+
 #include <string>
 #include <iostream>
 #include <exception>
@@ -8,6 +6,7 @@
 
 using std::string;
 
+///-------------------------- BigInteger ------------------------------------///
 class ParseError : public std::exception {
     const char *what() const _NOEXCEPT override {
         return "Cannot parse invalid integer.";
@@ -24,42 +23,28 @@ class BigInteger {
 public:
 
     BigInteger() : value("0"), negative(false) {}
-
     explicit BigInteger(int i);
-
     explicit BigInteger(const string &s);
-
     BigInteger(const BigInteger &bi);
-
     ~BigInteger() = default;
 
     // Unary operator
     BigInteger operator-() const;
-
     BigInteger operator+() const;
-
     BigInteger absolute() const;
 
     std::ostream &show(std::ostream &os) const;
-
     int compare(const BigInteger &bi) const;
 
+    // Binary operator
     BigInteger &operator=(const BigInteger &bi);
-
     BigInteger operator+(const BigInteger &bi) const;
-
     BigInteger operator-(const BigInteger &bi) const;
-
     BigInteger operator*(const BigInteger &bi) const;
-
     BigInteger operator/(const BigInteger &bi) const;
-
     BigInteger operator%(const BigInteger &bi) const;
-
     BigInteger operator^(const BigInteger &bi) const;
-
     bool operator==(const BigInteger &bi) const;
-
 
 protected:
     string value;
@@ -355,8 +340,9 @@ std::ostream &operator<<(std::ostream &os, const BigInteger &bi) {
     return os;
 }
 
-using std::string;
 
+
+///------------------------ ExpressionExceptions ----------------------------///
 class UnidentifiedToken : public std::exception {
 public:
     explicit UnidentifiedToken(char o) : op(o) {}
@@ -392,29 +378,29 @@ public:
     }
 };
 
-class BasicExpressionNode {
+
+///---------------------- ExpressionNode(abstract) --------------------------///
+class ExpressionNode {
 public:
-    BasicExpressionNode() = default;
+    ExpressionNode() = default;
+    virtual ~ExpressionNode() = default;
 
-    virtual ~BasicExpressionNode() = default;
-
+    // calculating
     virtual BigInteger evaluate() = 0;
-
+    // visiting
     virtual void prefixVisit(std::ostream &os) = 0;
-
     virtual void postfixVisit(std::ostream &os) = 0;
 };
 
-class NumberNode : public BasicExpressionNode {
+///------------------------------ NumberNode --------------------------------///
+class NumberNode : public ExpressionNode {
+    // Tree leaves
 public:
     explicit NumberNode(const BigInteger &bi) : num(bi) {}
-
     ~NumberNode() override = default;
 
     BigInteger evaluate() override;
-
     void prefixVisit(std::ostream &os) override;
-
     void postfixVisit(std::ostream &os) override;
 
 private:
@@ -433,26 +419,22 @@ void NumberNode::postfixVisit(std::ostream &os) {
     os << num;
 }
 
-class OperationNode : public BasicExpressionNode {
+///------------------------------ OperationNode -----------------------------///
+class OperationNode : public ExpressionNode {
+    // Tree parents
 public:
-    OperationNode(char o, BasicExpressionNode *left, BasicExpressionNode *right)
-            : op(o), leftChild(left), rightChild(right) {
-
-    }
-
+    OperationNode(char o, ExpressionNode *left, ExpressionNode *right)
+            : op(o), leftChild(left), rightChild(right) { }
     ~OperationNode() override;
 
     BigInteger evaluate() override;
-
     void prefixVisit(std::ostream &os) override;
-
     void postfixVisit(std::ostream &os) override;
-
 
 private:
     char op;
-    BasicExpressionNode *leftChild;
-    BasicExpressionNode *rightChild;
+    ExpressionNode *leftChild;
+    ExpressionNode *rightChild;
 };
 
 OperationNode::~OperationNode() {
@@ -495,24 +477,22 @@ void OperationNode::postfixVisit(std::ostream &os) {
     os << ' ' << op << ' ';
 }
 
+
+///--------------------------- ExpressionParser -----------------------------///
 class ExpressionParser {
-    class StringHandler {
+    class StringHandler { // handler for string
     public:
         explicit StringHandler(string expr)
                 : expression(std::move(expr)), curPos(0),
                   curOp('\0') { next(); };
 
-        void preprocess();          // throws exceptions
-
+        void preprocess();
         void next();
-
-        bool isOp() { return status == Operator; }
-
+        bool isOp()  { return status == Operator; }
         bool isNum() { return status == Number; }
-
         bool isEnd() { return status == End; }
 
-    public:                     // fields
+    public:
         string expression;
         unsigned int curPos;
         char curOp;
@@ -527,19 +507,18 @@ class ExpressionParser {
 
 public:
     explicit ExpressionParser(string expr) : handler(std::move(expr)) {};
-
     ~ExpressionParser() = default;
 
-    BasicExpressionNode *parse(int precedence);
+    // parse
+    ExpressionNode *parse(int precedence);
+    ExpressionNode *unaryParse();
 
-    BasicExpressionNode *unaryParse();
-
+    // result
     void calculate();
-
     const BigInteger &getResult() { return result; }
 
+    // visit
     void prefixTraverse(std::ostream &os);
-
     void postfixTraverse(std::ostream &os);
 
 private:
@@ -555,10 +534,10 @@ private:
 
     StringHandler handler;
     BigInteger result;
-    BasicExpressionNode *tree = nullptr;
+    ExpressionNode *tree = nullptr;
 
+    // operation rules
     static Precedence precedenceOf(char op);
-
     static Associativity associativityOf(char op);
 };
 
@@ -603,7 +582,7 @@ void ExpressionParser::StringHandler::preprocess() {
         throw EmptyExpression();
     }
     enum {
-        cDigit, cParenthesis, cWhiteSpace, cOperator
+        cDigit, cParenthesis, cWhiteSpace, cOperator, cClose
     } lastChar = cDigit, lastNonSpace = cDigit;
     expression = expression.substr(expression.find_first_not_of(' '));
 
@@ -611,7 +590,8 @@ void ExpressionParser::StringHandler::preprocess() {
         char c = expression[i];
         if (c >= '0' && c <= '9') {
             if (i != 0) {
-                if (lastChar == cWhiteSpace && lastNonSpace == cDigit) {
+                if ((lastChar == cWhiteSpace && lastNonSpace == cDigit)
+                    || lastNonSpace == cClose) {
                     throw SyntaxError();
                 }
                 lastChar = cDigit;
@@ -631,14 +611,13 @@ void ExpressionParser::StringHandler::preprocess() {
             lastNonSpace = cOperator;
             lastChar = cOperator;
         } else if (c == ')') {
-            lastNonSpace = cDigit;
-            lastChar = cDigit;
+            lastNonSpace = cClose;
+            lastChar = cClose;
         } else {
             lastChar = cOperator;
             lastNonSpace = cOperator;
         }
     }
-//    std::cout << "After processing:" << expression << "\n";
 }
 
 ExpressionParser::Precedence ExpressionParser::precedenceOf(char op) {
@@ -663,7 +642,7 @@ ExpressionParser::Associativity ExpressionParser::associativityOf(char op) {
     return Left;
 }
 
-BasicExpressionNode *ExpressionParser::parse(int precedence) {
+ExpressionNode *ExpressionParser::parse(int precedence) {
     if (precedence >= UnaryPrecedence) {
         return unaryParse();
     }
@@ -672,12 +651,10 @@ BasicExpressionNode *ExpressionParser::parse(int precedence) {
         return leftOperand;
     char op = handler.curOp;
     if (associativityOf(op) == Right) {
-//        std::cerr << op << ' ';
         handler.next();
         return new OperationNode(op, leftOperand, parse(precedence));
     } else {
         while (precedenceOf(op) == precedence && !handler.isEnd()) {
-//            std::cerr << op << ' ';
             handler.next();
             auto rightOperand = parse(precedence + 1);
             leftOperand = new OperationNode(op, leftOperand, rightOperand);
@@ -687,8 +664,8 @@ BasicExpressionNode *ExpressionParser::parse(int precedence) {
     }
 }
 
-BasicExpressionNode *ExpressionParser::unaryParse() {
-    BasicExpressionNode *ret = nullptr;
+ExpressionNode *ExpressionParser::unaryParse() {
+    ExpressionNode *ret = nullptr;
     if (handler.isOp() && handler.curOp == '(') {
         handler.next();
         ret = parse(AddPrecedence);
@@ -699,7 +676,6 @@ BasicExpressionNode *ExpressionParser::unaryParse() {
         handler.next();
     } else {
         if (handler.isOp() && handler.curOp == '-') {
-            // Unary negation
             handler.next();
             auto temp = unaryParse();
             ret = new NumberNode(-temp->evaluate());
@@ -708,7 +684,6 @@ BasicExpressionNode *ExpressionParser::unaryParse() {
             handler.next();
             ret = unaryParse();
         } else if (handler.isNum()) {
-//            std::cerr << handler.curNum << " ";
             ret = new NumberNode(handler.curNum);
             handler.next();
         }
@@ -740,7 +715,6 @@ public:
     void run();
 
     void compareResults();
-
     void exceptionTests();
 
 private:
@@ -820,7 +794,6 @@ void TestCases::compareResults() {
     for (int i = 0; i < testNum; ++i) {
         try {
             testCases[i].calculate();
-//            cout << testCases[i].getResult() << " to " << answers[i] << std::endl;
             if (testCases[i].getResult() == answers[i]) {
                 ++correctNum;
             }
@@ -847,7 +820,7 @@ void TestCases::exceptionTests() {
     }
 }
 
-#define CASE_TEST
+//#define CASE_TEST
 
 int main() {
     using std::cout;
@@ -860,18 +833,18 @@ int main() {
     cout << "Enter your expression with an enter/return marking the end.\n";
     std::getline(cin, expr);
     while (!expr.empty()) {
-        ExpressionParser parser = ExpressionParser(expr);
         try {
+            ExpressionParser parser = ExpressionParser(expr);
             parser.calculate();
+            cout << "Prefix traverse:  ";
+            parser.prefixTraverse(cout);
+            cout << "Postfix traverse: ";
+            parser.postfixTraverse(cout);
+            cout << "Result          : " << parser.getResult() << '\n' << std::endl;
         } catch (std::exception &e) {
             cout << "Error occur: " << e.what() << std::endl;
-            continue;
+            cout << "Try again: \n";
         }
-        cout << "Prefix traverse: ";
-        parser.prefixTraverse(cout);
-        cout << "Postfix traverse: ";
-        parser.postfixTraverse(cout);
-        cout << "Result          : " << parser.getResult() << '\n' << std::endl;
         std::getline(cin, expr);
     }
     cout << "Bye~\n";
