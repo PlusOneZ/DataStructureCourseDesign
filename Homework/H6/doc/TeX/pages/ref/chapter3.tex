@@ -1,0 +1,127 @@
+% Chapter 3
+
+\chapter{公式插图表格列表}
+
+\section{使用公式}
+\lstinline{amsmath} 宏包提供多种公式环境以及许多相关的排版命令，可用以改进和提高数学结构的排版效果。\textsf{注意，公式前不要空行。}我们打出一个矩阵：
+\begin{equation}
+	\boldsymbol{A}=\left[ \begin{matrix}
+	a_{11}&		a_{12}&		\cdots&		a_{1n}\\
+	a_{21}&		a_{22}&		\cdots&		a_{2n}\\
+	\vdots&		\vdots&		\ddots&		\vdots\\
+	a_{m1}&		a_{m2}&		\cdots&		a_{mn}\\
+	\end{matrix} \right] =\left[ \begin{matrix}
+	\boldsymbol{a}_1 & \boldsymbol{a}_2	&	\cdots&	\boldsymbol{a}_n\\
+	\end{matrix} \right]
+	\label{eq1}
+\end{equation}
+可以通过添加标签在正文中引用公式，如带有中文括号的引用\cref{eq1}。
+
+\lstinline{align} 环境用于\textsf{两个及以上}需要垂直对齐的公式，一般的像等于号之类的二元算符是被对齐的。变体的块环境 \lstinline{aligned} 使得内容的长度就是它的\textsf{实际长度}，可以用作包含表达式的组件。\lstinline{split} 环境是针对\textsf{单个长公式}，使用\& 标记对齐点。\lstinline{split} 环境不提供编号，只能在其他行间公式结构中使用。例如：
+\begin{equation}
+	\begin{split}
+		H_c&=\frac{1}{2n} \sum^n_{l=0}(-1)^{l}(n-{l})^{p-2}
+		\sum_{l _1+\dots+l _p=1}\prod^p_{i=1} \binom{n_i}{l _i}
+		\\
+		&\quad\cdot[(n-1 )-(n_i-l _i)]^{n_i-l _i}\cdot
+		\Bigl[(n-l )^2-\sum^p_{j=1}(n_i-l _i)^2\Bigr].
+	\end{split}
+\end{equation}
+
+调用 \lstinline{cases} 括号宏包提供的左花括号 \lstinline{subnumcases} 环境，可将花括号右侧的每行公式都给出一个子序号：
+\begin{subnumcases}{y=}
+	C_1e^{r_1x}+C_2e^{r_2x} &\quad $p^2-4q>0$\\
+	\left( C_1+C_2 \right) e^{r_1x} &\quad $p^2-4q=0$\\
+	e^{\alpha x}\left( C_1\cos \beta x+C_2\sin \beta x \right) &\quad $p^2-4q<0$
+\end{subnumcases}
+
+\lstinline{multline} 环境适用于一行无法放下的公式。\lstinline{multline} 的第一行在最左边，最后一行在最右边，除了在两边有缩进量，中间的任何其他行都会在行间公式宽度内独立居中。这里举一个长公式排版的例子：
+\begin{multline}
+	Q_k=\sum_{i=1}^n{\left( F_{ix}\frac{\partial x_i}{\partial q_k}+F_{iy}\frac{\partial y_i}{\partial q_k}+F_{iz}\frac{\partial z_i}{\partial q_k} \right)}
+	\\
+	=-\sum_{i=1}^n{\left( \frac{\partial V}{\partial x_i}\frac{\partial x_i}{\partial q_k}+\frac{\partial V}{\partial y_i}\frac{\partial y_i}{\partial q_k}+\frac{\partial V}{\partial z_i}\frac{\partial z_i}{\partial q_k} \right)}=-\frac{\partial V}{\partial q_k}
+\end{multline}
+
+\clearpage
+\section{使用插图}
+当我们需要排列一组子图共享标题的图片时，可以使用依赖于 \lstinline{caption} 宏包的 \lstinline{subcaption} 宏包的功能，效果见\cref{fig1}。
+\begin{figure}[htbp]
+	\centering
+	\subcaptionbox{并排子图1}{
+	\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{example-image-duck}
+}
+\hspace{1.2em}
+	\subcaptionbox{并排子图2}{
+	\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{example-image-duck}
+}
+	\caption[使用subcaption排版子图]{使用subcaption宏包的subcaptionbox命令排版子图}
+	\label{fig1}
+\end{figure} 
+
+\section{使用表格}
+合并表格列使用 \lstinline{\multicolumn} 命令，合并行使用 \lstinline{\multirowcell} 命令。当插入的表格内容过长以至于一行放不下的情况可以使用 \lstinline{tabularx} 环境，设置了\textsf{L、C和R}三个列对齐选项，一个例子如\cref{tab1} 所示。
+\begin{table}[htbp]
+\centering
+\caption{使用tabularx创建内容过长表格}\small
+\label{tab1}
+	\begin{tabularx}{0.87\textwidth}{@{}llL@{}}
+		\toprule
+		Aliquam & Integer & Pellentesque tincidunt purus
+		vel magna. \\
+		\midrule
+		viverra & \multirowcell{3}[0ex][l]{metus} & Nulla malesuada porttitor diam. Vestibulum lectus. Proin mauris. Proin eu nunc eu urna hendrerit faucibus. \\
+		semper & & Nullam elementum, urna vel imperdiet sodales, elit ipsum pharetra ligula, ac pretium ante justo a nulla. Curabitur tristique arcu eu metus.  \\
+		\multicolumn{2}{c}{\multirowcell{3}{convallis}} & Nunc elementum fermentum wisi. Aenean placerat. Ut imperdiet, enim sed gravida sollicitudin, felis odio placerat quam, ac pulvinar elit purus eget enim. \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\clearpage
+\section{使用列表}
+\lstinline{enumitem} 宏包为系统自带的列表环境提供了更灵活的标签以及间距的控制。已设置默认格式，若自定义标签可例如
+\begin{lstlisting}[numbers=none]
+\begin{enumerate}[label=\arabic*(a),leftmargin=1cm,resume]
+\begin{itemize}[label=\textbullet]
+\begin{description}[font=\sffamily\bfseries,style=nextline]
+\end{lstlisting}
+
+\subsection{排序列表}
+\begin{enumerate}
+\item 使用 \lstinline{enumerate} 环境可创建有序列表。
+\item 第二项
+	\begin{enumerate}
+	\item 第二项中的第一项
+	\end{enumerate}
+\end{enumerate}
+使用 \lstinline{paralist} 宏包提供 \lstinline{inparaenum} 环境产生行内部列表。可以使用\textsf{A、a、I、i和1}作为可选项为 \lstinline{compactenum} 与 \lstinline{inparaenum} 格式化标签，
+\begin{inparaenum}[(a)]
+\item 行内第一项
+\item 行内第二项
+\end{inparaenum}。
+若生成\textbf{Item I、Item II、Item III}格式，也可以这样
+\begin{lstlisting}[numbers=none]
+\begin{inparaenum}[(a)]
+\begin{compactenum}[\bfseries{Item}I]
+\end{lstlisting}
+
+\subsection{常规列表}
+\begin{itemize}
+\item 第一项\\
+使用 \lstinline{itemize} 环境可创建不计数列表，若换行不缩进。\par
+若在列表中分段后则缩进两字符。
+\item 第二项
+	\begin{itemize}
+	\item 与 \lstinline{inparaenum} 环境类似，\lstinline{inparaitem} 为行内常规列表，也提供一个可选参数。
+	\end{itemize}
+\end{itemize}
+用$\star$取代默认的符号
+\begin{lstlisting}[numbers=none]
+\begin{inparaitem}[$\star$]
+\begin{compactitem}[$\star$]
+\end{lstlisting}
+
+\subsection{主题列表}
+\begin{description}
+	\item[主题一] 使用 \lstinline{description} 环境可创建带有主题词的列表。
+	\item[主题二] 详细内容
+\end{description} 

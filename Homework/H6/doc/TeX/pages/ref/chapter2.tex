@@ -1,0 +1,26 @@
+% Chapter 2
+
+\chapter{编译环境}
+本模板调用了以下宏包\footnote{仅包括直接调用的宏包。}，这些宏包在常见的\TeX 发行版中都已包含，在使用本模板之前，请确认你的\TeX 发行版中正确安装了这些宏包。建议安装最新版\TeX~Live套装，并将宏包更新为最新版本。默认的编码格式为 \lstinline{UTF8}，编译引擎为\hologo{XeLaTeX}与\hologo{BibTeX}，\textsf{否则会报错}。
+\begin{table}[htbp]
+	\centering
+	\caption{加载的宏包}\sffamily
+	\renewcommand\tabcolsep{1em}    
+	\setcellgapes{.8ex}\makegapedcells
+	\begin{tabular}{cccc}
+	\toprule
+		ctex        & kvoptions     & etoolbox      & xcolor \\
+		pdfpages    & setspace      & tikz          & amsmath \\
+		amssymb     & amsthm        & mhchem        & chemfig \\
+		txfonts     & siunitx       & geometry      & fancyhdr \\
+		titletoc    & caption       & subcaption    & rotfloat \\
+		graphicx    & tabularx      & multirow      & makecell \\
+		tabu        & booktabs      & cleveref      & enumitem \\
+		footmisc    & natbib        & listings      & hyperref \\
+		hologo		& ulem			& cases			& imakeidx \\
+		duckuments 	& paralist 		& wrapfig 		& fontawesome \\
+		mathtools   & doclicense 	& marginnote \\
+	\bottomrule
+	\end{tabular}
+\end{table}\\
+如果你还未安装这些宏包，可以启动你的\TeX 发行版的宏包管理器来安装，或者到综合\TeX 文件网站 \url{http://www.ctan.org} 上搜索下载安装并可查找相关宏包帮助文档。
