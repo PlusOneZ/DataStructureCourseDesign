@@ -1,16 +1,13 @@
 \addvspace {9.60004pt}
 \addvspace {9.60004pt}
-\contentsline {figure}{\numberline {2.1}{\ignorespaces 双链表结构示意图\relax }}{3}{figure.caption.2}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces 哈希表结构示意图\relax }}{3}{figure.caption.3}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces 添加考生信息逻辑图\relax }}{4}{figure.caption.4}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces 删除考生信息逻辑图\relax }}{5}{figure.caption.5}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces 查询考生信息逻辑图\relax }}{5}{figure.caption.6}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces 修改考生信息逻辑图\relax }}{6}{figure.caption.7}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces 一颗表达式树\relax }}{4}{figure.caption.2}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces 结合律（左：左结合，右：右结合）\relax }}{5}{figure.caption.5}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces $3^{2^{2^2}}$的树\relax }}{6}{figure.caption.6}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces 表达式树求值过程\relax }}{7}{figure.caption.9}%
 \addvspace {9.60004pt}
 \addvspace {9.60004pt}
 \addvspace {9.60004pt}
-\contentsline {figure}{\numberline {5.1}{\ignorespaces 查找HashTable中的值\relax }}{15}{figure.caption.8}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces 添加值到HashTable\relax }}{15}{figure.caption.9}%
+\addvspace {9.60004pt}
 \addvspace {9.60004pt}
 \addvspace {9.60004pt}
 \addvspace {9.60004pt}

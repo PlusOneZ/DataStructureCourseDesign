@@ -297,7 +297,7 @@ BigInteger BigInteger::operator/(const BigInteger &bi) const {
 // Throws DivideByZero exception
 BigInteger BigInteger::operator%(const BigInteger &bi) const {
     BigInteger divider = *this / bi;
-    return (*this - divider * bi);
+    return ((*this - divider * bi).compareAbs(*this - (divider * bi - bi)) < 0) ? (*this - divider * bi) : (*this - (divider * bi - bi));
 }
 
 BigInteger BigInteger::operator^(const BigInteger &bi) const {
@@ -582,7 +582,7 @@ void ExpressionParser::StringHandler::preprocess() {
         throw EmptyExpression();
     }
     enum {
-        cDigit, cParenthesis, cWhiteSpace, cOperator, cClose
+        cDigit, cParenthesis, cWhiteSpace, cOperator, cOpen, cClose
     } lastChar = cDigit, lastNonSpace = cDigit;
     expression = expression.substr(expression.find_first_not_of(' '));
 
@@ -599,23 +599,30 @@ void ExpressionParser::StringHandler::preprocess() {
             }
         } else if (string("+-*/%^() ").find_first_of(c) == string::npos) {
             throw UnidentifiedToken(c);
-        } else if (c == ' ') {
-            lastChar = cWhiteSpace;
-        } else if (c == '(') {
-            if (i != 0 && lastNonSpace == cDigit) {
-                auto len = expression.length();
-                expression = expression.substr(0, i) + "*" +
-                             expression.substr(i, len - i);
-                i++;
-            }
-            lastNonSpace = cOperator;
-            lastChar = cOperator;
-        } else if (c == ')') {
-            lastNonSpace = cClose;
-            lastChar = cClose;
         } else {
-            lastChar = cOperator;
-            lastNonSpace = cOperator;
+            if (lastNonSpace == cOperator && c != ' ' && c != '(' && c != '+' && c != '-') {
+                std::cerr << c;
+                throw SyntaxError();
+            }
+            if (c == ' ') {
+                lastChar = cWhiteSpace;
+            } else if (c == '(') {
+                if (i != 0 &&
+                    (lastNonSpace == cDigit || lastNonSpace == cClose)) {
+                    auto len = expression.length();
+                    expression = expression.substr(0, i) + "*" +
+                                 expression.substr(i, len - i);
+                    i++;
+                }
+                lastNonSpace = cOpen;
+                lastChar = cOpen;
+            } else if (c == ')') {
+                lastNonSpace = cClose;
+                lastChar = cClose;
+            } else {
+                lastChar = cOperator;
+                lastNonSpace = cOperator;
+            }
         }
     }
 }
@@ -669,7 +676,6 @@ ExpressionNode *ExpressionParser::unaryParse() {
     if (handler.isOp() && handler.curOp == '(') {
         handler.next();
         ret = parse(AddPrecedence);
-        // Should be ')'
         if (handler.status != StringHandler::Operator || handler.curOp != ')') {
             throw ParenthesesNotMatch();
         }
@@ -695,6 +701,9 @@ void ExpressionParser::calculate() {
     if (tree == nullptr) {
         handler.preprocess();
         tree = parse(AddPrecedence);
+        if (!handler.isEnd()) {
+            throw SyntaxError();
+        }
         result = tree->evaluate();
     }
 }
@@ -712,6 +721,8 @@ void ExpressionParser::postfixTraverse(std::ostream &os) {
 
 class TestCases {
 public:
+    typedef BigInteger BI;
+    typedef ExpressionParser EP;
     void run();
 
     void compareResults();
@@ -720,24 +731,24 @@ public:
 private:
     static constexpr int testNum = 11;
     static constexpr int exceptionNum = 6;
-    ExpressionParser testCases[testNum] = {
-            ExpressionParser("((((1))))="),     // parentheses
-            ExpressionParser("1+1+1+1-1-1"),    // adding and subtracting
-            ExpressionParser("10*60/89*45"),    // multiply and division
-            ExpressionParser("10293^253"),      // power and big integer
-            ExpressionParser("8764 % 675"),     // modulo
-            ExpressionParser("5+8*8-98/9"),     // precedence - 1
-            ExpressionParser("87*43/3^2+98%3"), // precedence - 2
-            ExpressionParser("(8+6*(5+4)^3)%31"),// precedence -3
-            ExpressionParser("3^3^3"),          // right association power
-            ExpressionParser("8+-5--4++73"),    // unary operation
-            ExpressionParser("847(8374)"),
+    EP testCases[testNum] = {
+            EP("((((1))))="),     // parentheses
+            EP("1+1+1+1-1-1"),    // adding and subtracting
+            EP("10*60/89*45"),    // multiply and division
+            EP("10293^253"),      // power and big integer
+            EP("8764 % 675"),     // modulo
+            EP("5+8*8-98/9"),     // precedence - 1
+            EP("87*43/3^2+98%3"), // precedence - 2
+            EP("(8+6*(5+4)^3)%31"),// precedence -3
+            EP("3^3^3"),          // right association power
+            EP("8+-5--4++73"),    // unary operation
+            EP("847(8374)"),
     };
-    BigInteger answers[testNum] = {
-            BigInteger("1"),
-            BigInteger("2"),
-            BigInteger("270"),
-            BigInteger(
+    BI answers[testNum] = {
+            BI("1"),
+            BI("2"),
+            BI("270"),
+            BI(
                     "14897696150986096363009011212162797695162608511819030752"
                     "11806440825057750324616332439485272743494296640314300700"
                     "39448805991603931451937468282797320782058434387736855127"
@@ -757,21 +768,21 @@ private:
                     "61897819730020823450123893546714786066727577880460185375"
                     "72724768780106970997730472201113147265497843645627249934"
                     "04807493"),
-            BigInteger("664"),
-            BigInteger("59"),
-            BigInteger("417"),
-            BigInteger("11"),
-            BigInteger("7625597484987"),
-            BigInteger("80"),
-            BigInteger("7092778")
+            BI("664"),
+            BI("59"),
+            BI("417"),
+            BI("11"),
+            BI("7625597484987"),
+            BI("80"),
+            BI("7092778")
     };
-    ExpressionParser exceptionCases[exceptionNum] = {
-            ExpressionParser("2837&4$5=1"),
-            ExpressionParser("4563%(1-1)"),
-            ExpressionParser("(837465+8384^5465"),
-            ExpressionParser("1+"),
-            ExpressionParser(""),
-            ExpressionParser("1 2 3"),
+    EP exceptionCases[exceptionNum] = {
+            EP("2837&4$5=1"),
+            EP("4563%(1-1)"),
+            EP("(837465+8384^5465"),
+            EP("1+"),
+            EP(""),
+            EP("1 2 3"),
     };
     string expectedException[exceptionNum] = {
             "UnidentifiedToken",
@@ -801,7 +812,7 @@ void TestCases::compareResults() {
             cout << "Bad exceptions appear in legal expressions.";
         }
     }
-    cout << correctNum << " / " << testNum << "correctness. ";
+    cout << correctNum << " / " << testNum << " correctness. ";
     if (correctNum == testNum) {
         cout << "All correct!";
     }
@@ -841,6 +852,7 @@ int main() {
             cout << "Postfix traverse: ";
             parser.postfixTraverse(cout);
             cout << "Result          : " << parser.getResult() << '\n' << std::endl;
+            cout << "Enter your expression with an enter/return marking the end.\n";
         } catch (std::exception &e) {
             cout << "Error occur: " << e.what() << std::endl;
             cout << "Try again: \n";
