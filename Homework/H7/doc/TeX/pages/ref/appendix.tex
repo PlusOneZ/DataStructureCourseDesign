@@ -1,0 +1,17 @@
+% 附录
+
+\appendix
+\chapter{附\hspace{\ccwd}录}
+
+\section{附录二级标题}
+\begin{gather}
+	a_{q_i}=\frac{\mathrm{d}\boldsymbol{v}}{\mathrm{d}t}\cdot \boldsymbol{e}_i=\frac{1}{H_i}\left( \frac{\mathrm{d}\boldsymbol{v}}{\mathrm{d}t}\cdot \frac{\partial \boldsymbol{r}}{\partial q_i} \right) =\frac{1}{H_i}\left[ \frac{\mathrm{d}}{\mathrm{d}t}\left( \boldsymbol{v}\cdot \frac{\partial \boldsymbol{r}}{\partial q_i} \right) -\boldsymbol{v}\frac{\mathrm{d}}{\mathrm{d}t}\left( \frac{\partial \boldsymbol{r}}{\partial q_i} \right) \right] 
+	\\[0.6ex]
+	\frac{\mathrm{d}}{\mathrm{d}t}\left( \frac{\partial \boldsymbol{r}}{\partial q_i} \right) =\frac{\partial ^2\boldsymbol{r}}{\partial q_i\partial q_1}\dot{q}_1+\frac{\partial ^2\boldsymbol{r}}{\partial q_i\partial q_2}\dot{q}_2+\frac{\partial ^2\boldsymbol{r}}{\partial q_i\partial q_3}\dot{q}_3
+	\\[0.6ex]
+	\frac{\partial \boldsymbol{v}}{\partial q_i}=\frac{\partial}{\partial q_i}\left( \sum_{i=1}^3{\frac{\partial \boldsymbol{r}}{\partial q_i}\dot{q}_i} \right) =\frac{\partial ^2\boldsymbol{r}}{\partial q_i\partial q_1}\dot{q}_1+\frac{\partial ^2\boldsymbol{r}}{\partial q_i\partial q_2}\dot{q}_2+\frac{\partial ^2\boldsymbol{r}}{\partial q_i\partial q_3}\dot{q}_3
+	\shortintertext{故有}
+	\frac{\mathrm{d}}{\mathrm{d}t}\left( \frac{\partial \boldsymbol{r}}{\partial q_i} \right) =\frac{\partial \boldsymbol{v}}{\partial q_i}
+	\shortintertext{则}
+	a_{q_i}=\frac{1}{H_i}\left[ \frac{\mathrm{d}}{\mathrm{d}t}\left( \boldsymbol{v}\cdot \frac{\partial \boldsymbol{v}}{\partial \dot{q}_i} \right) -\boldsymbol{v}\frac{\partial \boldsymbol{v}}{\partial q_i} \right] 
+\end{gather}

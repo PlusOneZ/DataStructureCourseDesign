@@ -5,8 +5,8 @@
 下面按照一定的逻辑顺序介绍这几个类：
 
 \begin{itemize}
-    \item \lstinline{MultiTree} 类\\
-    由二叉树存储的多叉树类，遵循“左长子右兄弟”的规则进行存放。每个节点含有三个指针域，分别指向长子、兄弟和父母。
+    \item \lstinline{LinkedList} 类\\
+    链表类，存放顺序的学生名单结构。有 \lstinline{insert, remove, forEach} 方法用于插入、删除、遍历操作。
     \item \lstinline{HashTable} 类\\
     其中维护了一个 \lstinline{HashNode} 的 \lstinline{Vector}，通过其哈希函数（\lstinline{hash function}）完成对\lstinline{Vector}%
     数组的索引。主要通过\lstinline{find} 和 \lstinline{hasKey}索引和判断键的存在与否，通过 \lstinline{insert} 方法插入一个键唯一的对象。%
@@ -19,60 +19,68 @@
     \lstinline{HashTable} 类用与存放\lstinline{HashNode}的数组，相同哈希值的对象会以链表的方式存放在这个数组的单元里。%
     在\lstinline{HashTable} 类的实现中主要用到了下标运算、\lstinline{reserve(n)} 方法：开辟 $n$ 长度的数组。\lstinline{resize(n)}%
     方法：重新分配 $n$ 长度的内存。
-    \item \lstinline{GenealogyTreeSystem} 类\\
-    家谱管理系统封装类，使用了一个多叉树和一个哈希map来管理家谱的结构，并实现了前述功能。
+    \item \lstinline{Student, System} 类\\
+    \lstinline{Student} 类是学生信息的封装，\lstinline{System} 类是交互系统实现，通过 \lstinline{run} 函数来开启，%
+    内部封装了指令显示、读取以及指令实现的函数。
 \end{itemize}
 
-该部分主要详细介绍\lstinline{MultiTree} 类和 \lstinline{HashTable} 哈希表类的实现。
+该部分主要详细介绍\lstinline{LinkedList} 链表类和 \lstinline{HashTable} 哈希表类的实现，其余部分简单概括被使用的接口。
 
 
-\chapter{MultiTree 类}
+\chapter{LinkedList 类}
 
 \section{API}
 
 \subsection{类定义}
 以下是本题使用队列的 API，各函数的功能已用注释标出。
-\begin{lstlisting}[morendkeywords={MultiTree}, firstnumber=254, caption=MultiTree 类定义]{}
+\begin{lstlisting}[morendkeywords={LinkedList}, firstnumber=637, caption=LinkedList 类定义]{}
 template <class Type>
-class MultiTree {
+class LinkedList {
 public:
-    struct Node {  
-        Node(const Type& d, Node* par,
-             Node * child = nullptr, Node * sib = nullptr) :
-                data(d), firstChild(child), 
-                sibling(sib), parent(par) { }
+
+    struct LinkNode {           // 嵌套节点类
+        LinkNode *prev = nullptr;
+        LinkNode *next = nullptr;
         Type data;
-        Node * firstChild;
-        Node * sibling;
-        Node * parent;      // 添加子女、兄弟
-        Node * insertChild(const Type &d);
-        Node * insertSibling(const Type &d);
-        Node *leftMostOf();
-        Node *rightMostOf();
+
+        LinkNode() = default;
+        explicit LinkNode(const Type &);
     };
 
-public:
-    explicit MultiTree(const Type &d) {
-        root = new Node(d, nullptr);
-    }
-    ~MultiTree();
-    static Node *insertChild(Node *node, const Type &d);
-    static Node *insertSibling(Node *node, const Type &d);
-    Node *trivialFind(const Type& d);
-    std::ostream &show(std::ostream &os);
-    int dismissSubTree(Node *&node);    // 删除子树，保存姓名
-    int dismissSubTree(Node *&node, Vector<Type> &valList);
-    Node *getRoot() const;              // 打印树
-    void showNode(struct Node* node, int indent);
+    typedef LinkNode* Link;           // 别名
 
-private:
-    Node * root;
-    Vector<int> indentVec;
-    static bool deleteLeave(Node *&node, Node *&parent);
-    static Node *recursiveFind(Node *, const Type &d);
-    static void showNode(Node *, std::ostream & os);
+    LinkedList();                     // 构造器
+    LinkedList(LinkedList const &);
+    ~LinkedList();
+
+    int length() const;               // 大小
+    bool isEmpty() const;             // 是否为空
+    Link getHead() const;             // 获取首节点
+    Link getTail() const;             // 获取尾节点
+    int search(const Type& x) const;  //搜索和谓词搜索
+    int searchByMethod(std::function<bool(Type&)> m);
+    Link locate(int i) const;         // 取索引
+    Link insert(int i, const Type& d);// 插入
+    Link insert(int i, Link link);    
+    Link insertTarget(Link tar, Link link);
+    Link insertBack(const Type& d);   // 后端插入
+    bool remove(int i, Type& d);      // 删除
+    bool remove(int i, Link link = nullptr);
+    bool removeTarget(Link link, Type& d);
+
+    void forEach(std::function<void(Type&)>);
+                                      // 对所有节点操作 
+
+protected:
+    Link head;
+    Link tail;
+    int elemNum = 0;
+
+    bool makeNode(Link &) const;      // 分配新节点
+    bool makeNode(Link &, const Type& x) const;
 };
 \end{lstlisting}
+\vspace*{1cm}
 
 {
 \lstset{
@@ -82,118 +90,93 @@ private:
     }
 \subsection{公开成员}
 \begin{enumerate}
-    \item \lstinline{Node *insertChild(Node *node, const Type &d);}\\
-          对一个节点增加子女的操作，向子女方向走一次，走到节点的长子节点，再沿着兄弟方向走到底，在空指针处添加这个新节点。%
-          该函数委托了节点的 \lstinline{insertChild} 方法。
-    \item \lstinline{Node *insertSibling(Node *node, const Type &d);}\\
-          对一个节点的增加兄弟操作，节点向兄弟方向走到底，在空指针的位置创建新的节点。%
-          该函数委托了节点的 \lstinline{insertSibling} 方法。
-    \item \lstinline{int dismissSubTree(Node *&node, Vector<Type> &valList);} \\
-          解散 \lstinline{node} 的家庭，具体做法在\ref{dismiss} 中描述。
-    \item \lstinline{Node *trivialFind(const Type& d);} \\
-          遍历找到值为 \lstinline{x} 的节点的位置，找不到返回 \lstinline{nullptr}。该方法没有被使用，因为有哈希map。
+    \item \lstinline{Link insertTarget(Link tar, Link link);}
+          插入在 \lstinline{tar} 后面。返回插入节点的指针。该函数有两个托管函数，通过位置 $i$ 来索引节点。
+    \item \lstinline{bool removeTarget(Link link, Type& d);}
+          删除 \lstinline{tar} 节点。返回是否成功。该函数有两个托管函数，通过位置 $i$ 来索引节点。
+    \item \lstinline{Link locate(int i) const;} \\
+          从位置$i$取出一个节点，如果没有节点则报错并返回 \lstinline{nullptr}。
+    \item \lstinline{int search(const Type& x) const;} \\
+          遍历找到值为 \lstinline{x} 的节点的位置，找不到返回-1。
+    \item \lstinline{int searchByMethod(std::function<bool(Type&)> method);} \\
+          返回第一个 \lstinline{method} 函数返回值为 \lstinline{true} 的节点的位置，找不到返回-1.
+    \item \lstinline{void forEach(std::function<void(Type&)> op);} \\
+          对每个元素都调用操作 \lstinline{op}，可以用于格式打印等操作。
 \end{enumerate}
 
 \subsection{私有成员}
 \begin{enumerate}
-    \item \lstinline{Node * root;} \\
-          根节点。
-    \item \lstinline{static bool deleteLeave(Node *&node, Node *&parent);} \\
-          删除叶子结点的函数，在 \lstinline{dismissSubTree} 中调用。
+    \item \lstinline{Link head; Link tail;} \\
+          该链表的头节点和尾节点。
+    \item \lstinline{int elemNum = 0;} \\
+          链表中现有元素的个数。
+    \item \lstinline{bool makeNode(Link &, const Type& x) const;} \\
+          用 $x$ 的值来分配并初始化一个新的节点，失败返回 \lstinline{nullptr}。
 \end{enumerate}
 }
 
 \section{代码逻辑与实现}
 
-逻辑已经在设计中概括，本部分展现实现功能的代码。
+\subsection{逻辑描述}
+
+
+双链表中，最主要改变其结构的动作是 {\kaishu 插入} 和 {\kaishu 删除}，因此要说明这两个部分的内容。
+
+插入节点时，先找到这个节点的前驱（后继向前走一格便是前驱），然后做按照顺序对目标节点操作：
+
+\begin{itemize}
+    \item 目标节点的后继指针指向前驱的后继，目标节点的前驱指针指向前驱；
+    \item 前驱的后继指针指向目标；
+    \item 后继的前驱指针指向目标。
+\end{itemize}
+
+删除节点时，先找到这个目标节点，然后按照顺序对目标节点操作：
+\begin{itemize}
+    \item 目标的前驱的后继指针指向目标的后继。
+    \item 目标的后继的前驱指针指向目标的前驱。
+    \item 释放目标的内存。
+\end{itemize}
+
+
+\subsection{代码实现}
 
 {
 \lstset{
-      morendkeywords={MultiTree, Node},
-      morendkeywords = {firstChild, root, }
+      morendkeywords={LinkedList},
+      morendkeywords = {head, tail, elemNum}
 }
 \begin{enumerate}
-      \item 给一个节点添加一个子女（静态成员）
-\begin{lstlisting} [firstnumber = 365, caption={MultiTree::insertChild}]
+      \item 插入到目标后
+\begin{lstlisting} [firstnumber = 792, caption={LinkedList::insertTarget}]
 template<class Type>
-typename MultiTree<Type>::Node *
-MultiTree<Type>::insertChild(Node *node, const Type &d) {
-    auto child = node->firstChild;
-    Node* ret;
-    if (!child) {
-        ret = node->insertChild(d);
-    } else {
-        child = child->rightMostOf(); // 右到底
-        ret = child->insertSibling(d);
+typename LinkedList<Type>::Link
+LinkedList<Type>::insertTarget(LinkedList::Link target, LinkedList::Link link) {
+    if (target == nullptr) {
+        return nullptr;
     }
-    if (ret == nullptr)
-        throw MultiTreeException("Cannot insert child");
-    return ret;
+    link->next = target->next;
+    link->next->prev = link;
+    target->next = link;
+    link->prev = target;
+    ++elemNum;
+    return link;
 } \end{lstlisting}
-      \item 给节点添加一个兄弟（静态成员）
-\begin{lstlisting} [firstnumber = 381, caption={MultiTree::insertSibling}]
+      \item 删除目标节点
+\begin{lstlisting} [firstnumber = 829, caption={LinkedList::removeTarget}]
 template<class Type>
-typename MultiTree<Type>::Node *
-MultiTree<Type>::insertSibling(Node *node, const Type &d) {
-    auto sib = node->rightMostOf(); // 右到底
-    auto ret = sib->insertSibling(d);
-    if (ret == nullptr)
-        throw MultiTreeException("Cannot insert sibling");
-    return ret;
+bool LinkedList<Type>::removeTarget(Link link, Type& d) {
+    d = link->data;
+    link->prev->next = link->next;
+    link->next->prev = link->prev;
+    try {
+        delete link;
+    } catch (std::exception& e) {
+        return false;
+    }
+    --elemNum;
+    return true;
 }\end{lstlisting}
-    \item 非递归解散节点下的家庭，返回值为删除节点的个数， \lstinline{valList} 存放删除的节点存放的值。
-\begin{lstlisting} [firstnumber = 293, caption={MultiTree::dismissSubTree}]
-template<class Type>
-int
-MultiTree<Type>::dismissSubTree(Node *&node, Vector<Type> &valList) {
-    if (node == nullptr)
-        return 0;
-    if (node == root && root->sibling == nullptr) {
-        throw MultiTreeException("Cannot delete only root");
-    }
-    auto *child = node->firstChild;
-    auto *p = child;
-    Node *temp;
-    int count = 0;
-    if (child != nullptr) {
-        while (child->sibling || child->firstChild) {
-            if (p->sibling) {
-                p = p->sibling;
-                continue;
-            } else if (p->firstChild) {
-                p = p->firstChild;
-                continue;
-            } else {
-                Node* parent;
-                valList.pushBack(p->data);
-                if (!deleteLeave(p, parent)) {
-                    throw MultiTreeException("Fail deleting leave.");
-                }
-                ++count;
-                p = parent;
-            }
-        }
-        valList.pushBack(child->data);
-        deleteLeave(child, temp);
-        ++count;
-    }
-    if (node->sibling) {
-        if (node->parent)
-            node->parent->sibling = node->sibling;
-        else
-            root = node->sibling;
-        node->sibling = nullptr;
-    } else {
-        node->parent->sibling = nullptr;
-    }
-    valList.pushBack(node->data);
-    node->parent = nullptr;
-    deleteLeave(node, temp);
-    ++count;
-    node = nullptr;
-    return count;
-}\end{lstlisting}
-
+      
 \end{enumerate}
 }
 
@@ -206,7 +189,7 @@ MultiTree<Type>::dismissSubTree(Node *&node, Vector<Type> &valList) {
 \subsection{类定义}
 {
 \lstset{morendkeywords={HashTable}}
-\begin{lstlisting}[firstnumber=550, caption=HashTable 类定义]{}
+\begin{lstlisting}[firstnumber=283, caption=HashTable 类定义]{}
 template<class ValueType, class Key, class HashFunction,
         class ExtractKey, class EqualKey>
 class HashTable {
@@ -266,8 +249,6 @@ C++ STL 的哈希表采用了“开链”方式组织解决冲突。“开链”
 键值是否存在表中时，只需要单向遍历这个单元的链表就行。理想情况下，键与哈希值是均匀分布的，每个单元只存储一个键；最坏条件下，哈希表退化成链表，查找开销为 $O(n)$。
 
 以下是流程图：
-
-\newpage
 
 {
     \begin{figure}[H]
@@ -333,7 +314,7 @@ C++ STL 的哈希表采用了“开链”方式组织解决冲突。“开链”
 \begin{itemize}
       \item \lstinline{ValueType &HashTable<..>::find(const Key &k)}\\
             找到 \lstinline{key} 的值。
-\begin{lstlisting} [firstnumber=713]
+\begin{lstlisting} [firstnumber=446]
 template<..>
 ValueType &
 HashTable<..>::
@@ -350,7 +331,7 @@ find(const Key &k) {
 }\end{lstlisting}
       \item \lstinline{bool HashTable<..>::insertUnique(const ValueType &obj);} \\
             插入一个值。
-\begin{lstlisting}[escapechar=^, firstnumber=679]
+\begin{lstlisting}[escapechar=^, firstnumber=409]
 template<..>
 bool
 HashTable<..>::
@@ -381,7 +362,7 @@ insertUnique(const ValueType &obj) {
 
 \subsection{Pair 类定义}
 \lstset{morendkeywords={Pair}}
-\begin{lstlisting}[firstnumber=817, caption=Pair 类定义]{}
+\begin{lstlisting}[firstnumber=551, caption=Pair 类定义]{}
 template<class First, class Second>
 struct Pair {
     typedef First firstType;
@@ -405,7 +386,7 @@ struct Pair {
 
 \subsection{StringHashMap 类定义}
 \lstset{morendkeywords={Pair}}
-\begin{lstlisting}[firstnumber=853, caption=StringHashMap 类定义]{}
+\begin{lstlisting}[firstnumber=586, caption=StringHashMap 类定义]{}
 template<class Value>
 class StringHashMap {
 public:
@@ -426,6 +407,7 @@ public:
     inline void insert(const string& s, const Value& val);
     inline void insert(const MapPair& pair);
 
+
 private:    // 用模板参数具体化 HashTable
     HashTable<
             MapPair,
@@ -439,103 +421,38 @@ private:    // 用模板参数具体化 HashTable
 }
 
 
-\chapter{GenealogyTreeSystem 类}
+\chapter{System 类}
 
-一个处理逻辑和与外界交互的封装类，存放家谱信息结构并用上述结构完成了题目要求的功能。
+一个处理逻辑和与外界交互的封装类，存放学生信息并用上述结构完成了题目要求的功能。
 
-\section{GenealogyTreeSystem 类定义}
-\lstset{morendkeywords={Pair, GenealogyTreeSystem}}
-\begin{lstlisting}[firstnumber=911, caption=GenealogyTreeSystem 类定义]{}
-class GenealogyTreeSystem {
+\subsection{System 类定义}
+\lstset{morendkeywords={Pair}}
+\begin{lstlisting}[firstnumber=986, caption=System 类定义]{}
+class System {
+    typedef LinkedList<Student>::Link Link;
 public:
-
-    GenealogyTreeSystem() : tree("") { }
-
+    enum Command { kQuit, kInsert, kDelete, kFind, kModify, kStatistic, kMenu };
+    System();
     void run();
-    bool parseCommand(char c);
-    void addAncestor();     // 加祖先
-    void addChild();        // 加子女
-    void dismissSubFamily();// 解散家庭
-    void rename();          // 改名
-    static void showMenu();
 
-private:
-    typedef MultiTree<string> TreeType;
-    typedef TreeType::Node NodeType;
-    TreeType tree;
-    StringHashMap<NodeType *> regMap;
-    StringHashMap<int> collisionCount;
-
-private:
-    static std::istream &clearInput(std::istream &is);
-    static void notValidCommand(const string &s);
-    string collisionHandle(const string &name);
+protected:
+    static void menu(); // 展示目录
+    int readCommand();  // 读指令
+    void insert();      // 插入
+    void remove();      // 删除
+    void find();        // 查找
+    void modify();      // 修改
+    void statistic();   // 统计
+    void show(int option = 0);//显示
+    void statAdd(const Student &s);
+    void statSub(const Student &s);
+                        // 统计用
+    LinkedList<Student> list;
+    StringHashMap<Link> hashMap;
+    long long maleCnt = 0;
+    long long femaleCnt = 0;
 };
 \end{lstlisting}
 
-其余部分前面都有提及，这里介绍姓名冲突下的处理：
-
-\section{重名处理}
-
-家谱树存放且仅存放一个姓名信息，由于真实家谱中也存在重名问题，因此要求用户重新输入重复的名字不够人性化。%
-姓名不能当作唯一识别的标志，保存相同的姓名又回使得搜索产生多义，使结构变得复杂。因此我用哈希map的功能%
-设计了一个姓名冲突处理功能，其工作逻辑是：
-
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop] {开始};
-            \node [io, below=.6cm of start] (input) {输入姓名 \lstinline{n}};
-            \node [condition, below=.6cm of input] (cond) {\lstinline{n} 已存在？};
-            \node [condition, below=.6cm of cond] (cond2) {重名表存在姓名 \lstinline{n}？};
-            \node [process, left=.7cm of cond2] (insert) {重名表插入 \lstinline{<n, 1>}};
-            \node [process, below=.6 of insert] (one) { \lstinline{m = 1}};
-            \node [process, below=.6cm of cond2] (get) {取出重名表中的次数 m};
-            \node [process, below=.6 of get] (add) {\lstinline{m = m + 1}};
-            \node [condition, below=1cm of add] (cond3) {\lstinline{n + m} 存在？};
-            \node [startstop, below=.6cm of cond3] (end) {返回\lstinline{n + m}};
-
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            % \draw [arr] (find) -- (cond);
-            \draw [arr] (cond) -- node[anchor=east] {是} (cond2);
-            \draw [arr] (cond2) -- node[anchor=east] {是} (get);
-            \draw [arr] (get) -- (add);
-            \draw [arr] (add) -- (cond3);
-            \draw [arr] (cond3) --  node[anchor=west] {否} (end);
-            % \draw [arr] (add) -- (end);
-            \draw [arr] (cond2) -- node[anchor=south] {否} (insert);
-            \draw [arr] (insert) -- (one);
-            \draw [arr] (one) |- ($(cond3.north) + (0, 0.5)$);
-            \draw [arr] (cond3) -- ($(cond3.east) + (0.9, 0)$) node[anchor=north] {是}  |- ($(add.north) + (0, 0.3)$);
-
-        \end{tikzpicture}
-        \caption{重名处理逻辑}
-    \end{figure}
-}
-
-处理的代码如下：
-
-\begin{lstlisting}[firstnumber=1096, caption=GenealogyTreeSystem::collisionHandle]{}
-string GenealogyTreeSystem::collisionHandle(const string &name) {
-    int n;
-    if (collisionCount.hasKey(name)) {
-        n = ++collisionCount[name];
-        while (regMap.hasKey(name + std::to_string(n))) {
-            n = ++collisionCount[name];
-        }
-    } else {
-        collisionCount.insert(name, 1);
-        n = 1;
-        while (regMap.hasKey(name + std::to_string(n))) {
-            n = ++collisionCount[name];
-        }
-    }
-    string newName = name + std::to_string(n);
-    cout << "Same name! " << name
-         << " renamed to " << newName << endl;
-    return newName;
-}
-\end{lstlisting}
+封装的具体代码涉及到许多繁琐的输入输出操作，这里不予展示，可以参照图\ref{add}、\ref{del}、\ref{find}、\ref{mod}的内容%
+理解其工作逻辑。

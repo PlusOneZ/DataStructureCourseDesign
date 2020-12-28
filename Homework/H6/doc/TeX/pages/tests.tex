@@ -41,197 +41,154 @@ public:
 
 \chapter{数据测试}
 
+\section{交互说明}
+
+\begin{itemize}
+    \item 所有姓名都是以换行结尾，会包括中间所有空白字符。(有空格和没有空格是两个名字)
+    \item 没有输入只输回车时可以打断当前的操作。
+    \item 展示出的树是二叉形式的家谱树。
+\end{itemize}
+
 \section{正常情况}
 \begin{enumerate}
-    \item 创建系统数据表
+    \item 创建系统根节点
 \begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4             -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE              -$
-    #2: 2345 Bob male 20 CS                   -$
-    #3: 3456 zzy m 20 DataStructure           -$
-    #4: 4567 miao pet 5 EatAndSleep           -$
-    Unidentified sex pet modified to 'unknown'
-    
-    Total 4 students added
-    No ID       Name        Sex     Age     Type of Examination
-    1. 1234     alice       female  20      SSE
-    2. 2345     Bob         male    20      CS
-    3. 3456     zzy         male    20      DataStructure
-    4. 4567     miao        unknown 5       EatAndSleep
+    Welcome to GenealogyTreeSystem!
+    To start, first input one ancestor's name, end with Return/Enter: zzy
 \end{lstlisting}
-可以看出，不合法的性别会被识别成 unknown。
 
     \item 目录
 \begin{lstlisting}[style=console]
-    |***** Menu of Commands *****|
-    |  1: Insert      2: Delete  |
-    |  3: Find        4: Edit    |
-    |  5: Statistics  0: Exit    |
+		------------Commands-----------
+		* 1. Add another ancestor     *
+		* 2. Add children to a member *
+		* 3. Dismiss someone's family *
+		* 4. Rename a person          *
+		* 5. Display Tree             *
+		* 0. Quit                     *
+		-------------------------------
+    To use these commands, type the (single) character and press Return/Enter.
 \end{lstlisting}
 
-    \item 添加成员
+    \item 添加祖先
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 1       -$
-    Enter the position of candidate: 1      -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    0123 Oscar m 21 Social                  -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 1234     alice       female   20      SSE
-    3. 2345     Bob         male     20      CS
-    4. 3456     zzy         male     20      DataStructure
-    5. 4567     miao        unknown  5       EatAndSleep
+    To use these commands, type the (single) character and press Return/Enter.
+    1
+    Enter the name of the ancestor, empty string to back-out: 
+    qyb
+    qyb added!
+\end{lstlisting}
+    增加成功会有提示
+
+    \item 添加子女
+\begin{lstlisting}[style=console]
+    To use these commands, type the (single) character and press Return/Enter.
+    2
+    Enter the name of the parent, end with Return/Enter.
+    Empty string to back-out: zzy
+    Input the amount of children to be added: 3
+    Enter the name of the child #1 end with Return/Enter, empty to quit: zz1
+    zz1 added!
+    Enter the name of the child #2 end with Return/Enter, empty to quit: zz2
+    zz2 added!
+    Enter the name of the child #3 end with Return/Enter, empty to quit: zz3
+    zz3 added!
 \end{lstlisting}
 
-    \item 删除（按位置）
+    \item 解散局部家庭
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to remove: 4 -$
-    The candidate removed is: 
-    3456       zzy          male     20      DataStructure
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 1234    alice        female   20      SSE
-    3. 2345    Bob          male     20      CS
-    4. 4567    miao         unknown  5       EatAndSleep
+    To use these commands, type the (single) character and press Return/Enter.
+    3
+    Enter the name of the ancestor of tree, end with Return/Enter.
+    Empty string to back-out: zzy
+    zz3
+    zz2
+    zz1
+    zzy
+    4 members removed.
 \end{lstlisting}
 
-    \item 插入（按考号）
+    \item 重命名
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 1234    -$
-    The candidate removed is: 
-    1234       alice        female   20      SSE
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 2345    Bob          male     20      CS
-    3. 4567    miao         unknown  5       EatAndSleep
+    To use these commands, type the (single) character and press Return/Enter.
+    4
+    Enter the name of the person to rename, end with Return/Enter.
+    Empty string to back-out: qyb
+    Enter qyb's new name, end with Return/Enter: haha
+    qyb renamed to haha
 \end{lstlisting}
 
-    \item 用考号查找学生
+    \item 打印存储二叉树
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 3       -$
-    Enter candidate's ID to find: 2345      -$
-    2345     Bob         male    20       CS
-\end{lstlisting}
-
-    \item 修改学生信息（按位置）
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 3   -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    4567 miao m 16 EatAndWalk               -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
-\end{lstlisting}
-
-    \item 统计
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 5       -$
-    Male: 3   Female: 0    Unknown: 0
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
+    To use these commands, type the (single) character and press Return/Enter.
+    5
+    zzy
+    ├── zz1
+    │   ├── (null)
+    │   └── zz2
+    └── qyb
 \end{lstlisting}
 
     \item 结束
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 0       -$
+    To use these commands, type the (single) character and press Return/Enter.
+    0
     Bye~
 \end{lstlisting}
 \end{enumerate}
 
-\vspace*{3cm}
 
 \section{输入异常}
 
 \begin{enumerate}
-    \item 创建系统数据表时直接中断
+    \item 添加子女时直接中断
 \begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4           -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE            -$
-    #2: 2345 Bob male 20 CS                 -$
-    #3:                                     -$ // 输入回车
-    
-    Total 2 students added
-    No ID       Name        Sex       Age       Type of Examination
-    1. 1234     alice       female    20        SSE
-    2. 2345     Bob         male      20        CS
+    To use these commands, type the (single) character and press Return/Enter.
+    2
+    Enter the name of the parent, end with Return/Enter.
+    Empty string to back-out: zzy
+    Input the amount of children to be added: 1000
+    Enter the name of the child #1 end with Return/Enter, empty to quit: 1
+    1 added!
+    Enter the name of the child #2 end with Return/Enter, empty to quit: 2
+    2 added!
+    Enter the name of the child #3 end with Return/Enter, empty to quit: 3
+    3 added!
+    Enter the name of the child #4 end with Return/Enter, empty to quit:  //回车
+    Exiting...
+    3 children added successfully!
 \end{lstlisting}
     用回车可以中断输入。
 
-    \item 插入输入不存在的位置
+    \item 插入：输入不存在的人名
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 1       -$
-    Enter the position of candidate: 6      -$
-    Position should be between 1 to 5       -$
-    Try again: // ...
+    To use these commands, type the (single) character and press Return/Enter.
+    2
+    Enter the name of the parent, end with Return/Enter.
+    Empty string to back-out: 123
+    Person not found, cannot add children!
 \end{lstlisting}
-    位置不存在会提醒重新输入。
+    不存在会提醒并中断操作。其他情况输入不存在的人名会得到相同结果。
 
-    \item 删除：位置不存在
+    \item 尝试删除唯一的家族树
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    6                                       -$
-    Try again, enter 1 / 2: 
-    1                                       -$
-    Enter candidate's position to remove: 6 -$
-    Invalid Index
-    Position 6 not found!
-
-    Enter your command, 6 for menu:  // ...
+    Welcome to GenealogyTreeSystem!
+    To start, first input one ancestor's name, end with Return/Enter: zzy
+            ------------Commands-----------
+            * 1. Add another ancestor     *
+            * 2. Add children to a member *
+            * 3. Dismiss someone's family *
+            * 4. Rename a person          *
+            * 5. Display Tree             *
+            * 0. Quit                     *
+            -------------------------------
+    To use these commands, type the (single) character and press Return/Enter.
+    3
+    Enter the name of the ancestor of tree, end with Return/Enter.
+    Empty string to back-out: zzy
+    Genealogy tree will be empty after remove, action stopped!
 \end{lstlisting}
-    功能选择错误会提醒重新输入，位置不存在会有提示并退出。
+    会阻止该行为。
 
-\item 删除：考号不存在
-\begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 0000    -$
-    Candidate with ID 0000 not found!
-
-    Enter your command, 6 for menu: // ...
-\end{lstlisting}
-    会给提示并退出。
-
-    \item 查找：找不到考号
-\begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 3
-    Enter candidate's ID to find: 
-    0000
-    Candidate with ID 0000 not found
-\end{lstlisting}
-    会给提示并退出。
-
-    \item 修改学生信息：位置或考号不存在
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 6   -$
-    Invalid Index
-    Position 6 not found!
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to edit: 0000      -$
-    Candidate with ID 0000 not found!
-\end{lstlisting}
-    与删除类似。
 
 \end{enumerate}

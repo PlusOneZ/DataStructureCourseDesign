@@ -1,76 +1,72 @@
 
 \chapter{背景分析}
 
-考试报名工作给各高校报名工作带来了新的挑战，给教务管理部门增加了很大的工作量。随着信息时代的来临，手动输入管理考生的信息效率低下%
-且容易出错，管理起来十分不便。如何快速地处理大规模的数据以及频繁的查询，是当今考试报名系统需要解决的关键问题。
 
-使用使用计算机技术来进行考试信息的维护和管理，其具有管理容量上限高，管理快速，成本低等多个巨大优势，能极大提升考试报名管理的效率。%
-本项目是对考试报名管理系统的简单模拟，系统主要有以下功能：输出考生信息、查询考生信息、添加考生信息、修改考生信息和删除考生信息。
+家谱：又称族谱、宗谱等。是一种以表谱形式，记载一个家族的世系繁衍及重要人物事迹的书。家谱属珍贵的人文资料，%
+对于历史学、民俗学、人口学、社会学和经济学的深入研究，均有其不可替代的独特功能。
 
-系统需要维护一个内存中的报名表，表中包含的信息有准考证号，姓名，性别，年龄和报考类别等。并能够通过准考证号查询到考生，指定修改信息、%
-删除等功能。
+随着电子时代的来临，传统纸媒介记载逐渐被替代，如果能用计算机存储这些家谱数据，便利的同时历史的遗产也将被保留，%
+可谓一举多得。
 
+家中最重要的信息是家庭的{\kaishu 层级关系(Hierarchy)}，即谁是谁的子女，谁是谁的父母。一个家长（父母）和子女的关系%
+是一对多的：一个家长可以有多个子女，但是一个人只能有一父一母。因此一个家谱层级关系可以映射到一颗多叉树上，每个节点存放一个人。
 
+本项目要求的功能与 {\kaishu 考试报名管理系统} 相似，要实现增、删、查、改四个功能。下面是一个家谱树示意：
+
+\forestset{ 
+  default preamble={ 
+    for tree={circle,draw, minimum width=0.8cm} 
+  } 
+} 
+
+\begin{figure} [H]
+    \centering
+    \begin{forest}
+        [卓负一 [卓正一 [卓斜一] [卓斜二] ] [卓正二 [卓斜三] ] [卓正三 [卓斜四] [卓斜五] [卓斜六]] ]
+    \end{forest}
+    \caption{家谱树示意图}
+\end{figure}
 
 
 \chapter{功能设计}
 
 \section{题意转化}
-依据题意，需要使用一个数据结构将学生信息存储起来，并能做到{\kaishu 增、删、查、改}四个功能。有许多数据结构都能做到这项功能%
-简单的有、{\kaishu 线性表}，如数组、链表等结构，复杂的有哈希表，以及二叉查找树、平衡二叉树等非线性结构。%
-本题使用了{\kaishu 双链表}作为主要的数据结构储存信息，双链表的数据组织如下图。
+该题的目的明确，要用一个能够模拟多叉树的数据结构将家谱内的层级信息储存起来，并能够做到{\kaishu 增、删、查、改}四个功能。%
+在实现上，能够模拟多叉树结构的数据结构，常用的有两种：一个是在节点内存放一个能够存储其所有子节点的线性结构（一般是 Vector），%
+这样的多叉树在逻辑结构上与存储的真实多叉树一致，因为其节点有真是的多叉结构。另一种做法是用二叉树存放多叉树，一个节点的一个指针域%
+存放与自己同级的节点，另一个域存放自己的子女级节点，这样任何多叉树到二叉树都存在唯一的映射；这种存储结构被称为“左长子右兄弟”方式。
 
-\newcommand{\data}{
-      data \nodepart{second}
-      \phantom{\texttt{NULL}}
-    }
+用两幅图可以看出这两者的对应关系：
 
-\begin{figure}[H]
-    \tikzstyle{ptr}  = [draw, -{Stealth[scale=1.0]}, blue]
-    \tikzstyle{head} = [rectangle, draw, text height=3mm, text width=3mm,
-                        text centered, node distance=3cm, inner sep=0pt]
-    \tikzstyle{data} = [rectangle split, rectangle split parts=3, draw, node distance=2.5cm, 
-                        text centered, minimum height=3em]
+图\ref{multi}是一棵多叉树，也是直接存储多叉树法的数据内部逻辑结构。图\ref{binary}是\ref{multi}对应的二叉树表示方式。本项目选用%
+“左长子右兄弟”法来储存家谱的层级结构。
+
+
+\begin{figure} [H]
     \centering
-    \begin{tikzpicture} [node distance=2cm, auto]
-    \node[data, node distance=2.5cm] (A) {data \nodepart{third} \footnotesize{nullptr}};
-    \node[data, right of=A] (B) {\data};
-    \node[data, right of=B] (C) {\data};
-    \node[data, right of=C] (D) {\data};
-    \node[data, right of=D] (E) {\data};
-    \node[data, right of=E, node distance=2.5cm] (last) {data \nodepart{second} \footnotesize{nullptr}};
-    
-    \draw[fill] ($(A.south)!0.67!(A.text split)$) circle (0.05);
-    \draw[ptr] ($(A.south)!0.67!(A.text split)$) --++(right:10mm) |- ($(B.south west)!0.67!(B.text split west)$);
-    \draw[fill] ($(B.south)!0.67!(B.text split)$) circle (0.05);
-    \draw[ptr] ($(B.south)!0.67!(B.text split)$) --++(right:10mm) |- ($(C.south west)!0.67!(C.text split west)$);
-    \draw[fill] ($(C.south)!0.67!(C.text split)$) circle (0.05);
-    \draw[ptr] ($(C.south)!0.67!(C.text split)$) --++(right:10mm) |- ($(D.south west)!0.67!(D.text split west)$);
-    \draw[fill] ($(D.south)!0.67!(D.text split)$) circle (0.05);
-    \draw[ptr] ($(D.south)!0.67!(D.text split)$) --++(right:10mm) |- ($(E.south west)!0.67!(E.text split west)$);
-    \draw[fill] ($(E.south)!0.67!(E.text split)$) circle (0.05);
-    \draw[ptr] ($(E.south)!0.67!(E.text split)$) --++(right:10mm) |- ($(last.south west)!0.67!(last.text split west)$);
-
-    \draw[fill] ($(B.south)!0.3!(B.text split)$) circle (0.05);
-    \draw[ptr] ($(B.south)!0.3!(B.text split)$) --++(left:10mm) |- ($(A.south east)!0.3!(A.text split east)$);
-    \draw[fill] ($(C.south)!0.3!(C.text split)$) circle (0.05);
-    \draw[ptr] ($(C.south)!0.3!(C.text split)$) --++(left:10mm) |- ($(B.south east)!0.3!(B.text split east)$);
-    \draw[fill] ($(D.south)!0.3!(D.text split)$) circle (0.05);
-    \draw[ptr] ($(D.south)!0.3!(D.text split)$) --++(left:10mm) |- ($(C.south east)!0.3!(C.text split east)$);
-    \draw[fill] ($(E.south)!0.3!(E.text split)$) circle (0.05);
-    \draw[ptr] ($(E.south)!0.3!(E.text split)$) --++(left:10mm) |- ($(D.south east)!0.3!(D.text split east)$);
-    \draw[fill] ($(last.south)!0.3!(last.text split)$) circle (0.05);
-    \draw[ptr] ($(last.south)!0.3!(last.text split)$) --++(left:10mm) |- ($(E.south east)!0.3!(E.text split east)$);
-    
-    
-    \end{tikzpicture}
-    \caption{双链表结构示意图}
+    \begin{forest}
+        [卓负一 [卓正一 [卓斜一] [卓斜二] ] [卓正二 [卓斜三] ] [卓正三 [卓斜四]] ]
+    \end{forest}
+    \caption{多叉树存储逻辑 - 直接模拟法}
+    \label{multi}
 \end{figure}
 
-通过单向访问节点可以增加、修改、删除一个节点，这三个操作的时间复杂度均为 $O(1)$ 级别的，而查找某个节点的时间复杂度是 $O(n)$ 级别的。%
-由于查找操作在一个考试系统中较为频繁的出现，所以在用链表储存有序的考生名单的基础上，我决定加用{\kaishu 哈希表}\emph{(Hash Table)}辅助进行查找，%
-哈希表的插入和删除时间复杂度均可看作 $O(1)$ 级别，其特点是空间复杂度为 $\Omega(n)$\footnote{$\Omega$ 为下界}，其中 $n$ 为存储%
-在表内的数据数量。本项目中，哈希表存放的是{\kaishu <考号, 节点指针>}的键值对。
+\newpage
+
+\begin{figure} [H]
+    \centering
+    \begin{forest}
+        [卓负一 [卓正一 [卓斜一 [卓斜二] [NULL] ] [卓正二 [卓斜三] [卓正三 [卓斜四] [NULL] ] ] ] [NULL] ]
+    \end{forest}
+    \caption{多叉树存储逻辑 - “左长子右兄弟”法}
+    \label{binary}
+\end{figure}
+
+
+在二叉树中，可以通过递归的方式遍历查找某个节点，遍历每次的时间复杂度 $O(n)$。本项目中几乎所有操作都需要查找一个已经存在的%
+家庭成员，$O(n)$的时间复杂度难以接受，我决定加用{\kaishu 哈希表}\emph{(Hash Table)}辅助进行查找，%
+哈希表的插入、删除和搜索时间复杂度均可看作 $O(1)$ 级别，其特点是空间复杂度为 $\Omega(n)$\footnote{$\Omega$ 为下界}，其中 $n$ 为存储%
+在表内的数据数量。本项目中，用字符串索引的哈希map(\lstinline{StringHashMap})用于保存已经存在家谱树中的姓名和所在节点的键值对。下图是哈希表的储存结构：
 
 {
 \begin{figure}[H]
@@ -114,16 +110,25 @@
 \end{figure}
 }
 
-\vspace*{1.0cm}
 
 \section{逻辑功能}
-{\kaishu 增、删}功能对应于双链表结构中的{\kaishu 插入、删除}功能，哈希表优化后的{\kaishu 查找}功能通过%
-哈希表的{\kaishu 查询（或索引）}功能实现。{\kaishu 修改}功能则是查找和赋值的结合。四种操作都十分简单。
 
-但由于考试报名系统中维护了一个顺序的双链表和一个哈希表，在{\kaishu 增、删、改}这三个需要改变数据的操作中，%
-在修改链表数据的{\kaishu 同时}一起修改哈希表当中的数据是十分必要的。因此，逻辑重点在于同时维护两套数据并使系统正常工作。
+为了实现{\kaishu 增、删、查、改}四个功能，我们要维护两套数据。一份放在多叉树里，另一份放在哈希map里。%
 
-\section{维护两套数据}
+
+需要实现的功能有以下四个：
+
+\begin{itemize}
+    \item 增加祖先。
+    \item 给指定成员添加子女。
+    \item 解散以指定成员为根节点的家庭。
+    \item 更改给定成员的姓名。
+\end{itemize}
+
+增加祖先的操作十分直接：在存储二叉树的根节点向兄弟方向走到底，在空指针的位置创建新的节点就是一个祖先。%
+创建的新节点需要加入哈希 map 中。
+
+添加子女和删除是需要查找的，下面给出他们的功能流程图。
 
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 2cm, 
         minimum height=1cm, text centered, draw = black, fill = red!40,
@@ -134,106 +139,102 @@
     \tikzstyle{condition} = [diamond, aspect = 3, text centered, draw=black, fill = green!30]
     \tikzstyle{arr} = [->, >=stealth, thick]
 
-\subsection{增加信息}
-增加操作是最简单的操作，流程图如下：
+\subsection{添加子女}
+
+对于一个存储二叉树节点，给它添加子女的操作是：向子女方向走一次，走到节点的长子节点，再沿着兄弟方向走到底，在空指针处添加这个新节点。
+有了这个操作，添加子女的流程图为：
+
+\newpage
+
 {
     \begin{figure}[H]
         \centering
         \begin{tikzpicture}
             \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {读取到 \lstinline{S}};
-            \node [condition, below=1cm of input] (cond) {\lstinline{S} 考号已经存在？};
-            \node [process, below=.7cm of cond] (toList) {\lstinline{S} 加入链表};
-            \node [process, below=.6cm of toList] (toMap) {\lstinline{S} 加入哈希表};
+            \node [io, below=.6cm of start] (input) {读取到 \lstinline{n}};
+            \node [condition, below=.6cm of input] (cond) {\lstinline{n} 姓名已存在？};
+            \node [io, below=.6cm of cond] (input2) {读取子女 \lstinline{c}};
+            \node [condition, below=.6cm of input2] (cond2) {\lstinline{c} 姓名已存在？};
+            \node [process, below=.6cm of cond2] (toList) {添加子女 \lstinline{c}};
+            \node [process, below=.6cm of toList] (toMap) {\lstinline{c} 加入哈希表};
             \node [startstop, below=.6cm of toMap] (end) {结束};
+            \node [process, left=.8cm of cond] (conf) {重名处理};
+            \node [process, right=.8cm of cond2] (conf2) {重名处理};
 
             \draw [arr] (start) -- (input);
             \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- node[anchor=west] {否} (toList);
+            \draw [arr] (cond) -- node[anchor=west] {否} (input2);
+            \draw [arr] (cond) -- node[anchor=south] {是} (conf);
+            \draw [arr] (conf) |- ($(input2.north) + (0, 0.3)$);
+            \draw [arr] (input2) -- (cond2);
+            \draw [arr] (cond2) -- node[anchor=east] {否} (toList);
+            \draw [arr] (cond2) -- node[anchor=south] {是} (conf2);
+            \draw [arr] (conf2) |- ($(toList.north) + (0, 0.3)$);
             \draw [arr] (toList) -- (toMap);
             \draw [arr] (toMap) -- (end);
 
-            \draw [arr] (cond) -- ($(cond.east) + (0.5, 0)$) node[anchor = west] {是} |- ($ (cond.north) + (0, 0.5) $);
-
         \end{tikzpicture}
-        \caption{添加考生信息逻辑图\label{add}}
-    \end{figure}
-}
-
-
-\subsection{删除信息}
-删除与增加类似，流程图如下：
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [condition, below=.7cm of input] (cond) {\lstinline{num} 考号存在？};
-            \node [process, left=1.3cm of cond] (toList) {\lstinline{S} 从链表删除};
-            \node [process, below=.6cm of toList] (toMap) {\lstinline{S} 从哈希表抹去};
-            \node [io, right=1.3cm of toMap] (out) {输出出考生信息};
-            \node [startstop, below=1cm of out] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- node[anchor=north] {是} (toList);
-            \draw [arr] (toList) -- (toMap);
-            \draw [arr] (toMap) -- (out);
-            \draw [arr] (out) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.9, 0)$) node[anchor = west] {否} |- ($ (end.north) + (0, 0.5) $);
-
-        \end{tikzpicture}
-        \caption{删除考生信息逻辑图\label{del}}
+        \caption{增加子女操作流程图}
     \end{figure}
 }
 
 \subsection{查找考生信息}
-通过调用哈希表的查询方法可以很快的找到考生并输出信息，流程图如下：
+
+在存储二叉树中删除子树需要从底向上删除，具体做法是：当一个节点没有兄弟和长子节点的时候（两者为空0，可以删除，并将当前节点置为这个节点的父母节点；%
+如果有存在子女或兄弟，则要进入存在的下级节点；当返回到要删除子树的根节点时说明删除完成。但是要注意，在家谱中解散 A 的局部家庭，我们不希望将%
+A 的兄弟的局部家庭也解散。所以我们要在 A 的长子节点上做遍历删除，删除后移除长子，并将 A 的父母指针接向 A 的下一个兄弟节点。\label{dismiss}
+
+有了这个操作，我们可以简单画出删除部分的流程：
+
+\newpage
 
 {
     \begin{figure}[H]
         \centering
         \begin{tikzpicture}
             \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [condition, below=.7cm of input] (cond) {\lstinline{S} 考号存在？};
-            \node [process, below=.7cm of cond, xshift=-2.75cm] (find) {找到考生};
-            \node [io, below=.7cm of find] (out) {输出考生信息};
+            \node [io, below=.7cm of start] (input) {输入姓名 \lstinline{n}};
+            \node [condition, below=.7cm of input] (cond) {\lstinline{n} 姓名};
+            \node [process, below=.7cm of cond, xshift=-2.75cm] (find) {找到对应节点};
+            \node [process, below=.7cm of find] (out) {删除子树};
             \node [io, below=.7cm of cond, xshift=2.75cm] (outErr) {输出错误提示};
             \node [startstop, below=.6cm of out, xshift=2.5cm] (end) {结束};
 
             \draw [arr] (start) -- (input);
             \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- ($(cond.west) + (-0.5, 0)$) node[anchor=east] {是} -- (find.north);
+            \draw [arr] (cond) -|  node[anchor=east] {是}  (find.north);
             \draw [arr] (find) -- (out);
             \draw [arr] (out) -- (end);
             \draw [arr] (outErr) -- (end);
 
-            \draw [arr] (cond) -- ($(cond.east) + (0.5, 0)$) node[anchor = west] {否} -- (outErr.north);
+            \draw [arr] (cond) -|  node[anchor = west] {否}  (outErr.north);
 
         \end{tikzpicture}
-        \caption{查询考生信息逻辑图\label{find}}
+        \caption{解散局部家庭操作流程图}
     \end{figure}
 }
 
-\subsection{修改考生信息}
+\subsection{修改姓名}
 修改考生信息除了要先找到考生之外，还有一些对哈希表操作的细节。流程图如下：
+
+重点在于哈希表存放了{\kaishu <姓名, 节点指针>}的键值对，修改后原姓名应该不能找到任何节点，所以要先删除，修改完成后再将该{\kaishu <新姓名, 节点指针>}对加入回哈希表，完成一次修改。%
+
+\newpage
 
 {
     \begin{figure}[H]
         \centering
         \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [process, below=.7cm of input] (find) {用 \lstinline{num} 查询考生 \lstinline{S}};
-            \node [condition, below=.7cm of find] (cond) {\lstinline{S} 不为空？};
-            \node [process, below=.8cm of cond] (erase) {\lstinline{S} 从哈希表抹去};
-            \node [io, below=.7cm of erase] (input2) {读取到 \lstinline{S}};
-            \node [condition, below=.6cm of input2] (cond2) {\lstinline{S} 考号已经存在？};
-            \node [process, below=.8cm of cond2] (add) {\lstinline{S} 加入哈希表};
-            \node [startstop, below=.8cm of add] (end) {结束};
+            \node (start) [startstop] {开始};
+            \node [io, below=.6cm of start] (input) {输入姓名 \lstinline{n}};
+            \node [process, below=.6cm of input] (find) {用 \lstinline{n} 查询成员 \lstinline{m}};
+            \node [condition, below=.6cm of find] (cond) {\lstinline{m} 不为空？};
+            \node [process, below=.6cm of cond] (erase) {\lstinline{m} 从哈希表抹去};
+            \node [io, below=.7cm of erase] (input2) {读取到 \lstinline{m}};
+            \node [condition, below=.6cm of input2] (cond2) {\lstinline{m} 姓名已经存在？};
+            \node [process, below=.6cm of cond2] (add) {\lstinline{S} 加入哈希表};
+            \node [startstop, below=.6cm of add] (end) {结束};
+            \node [process, left=.6cm of cond2] (conf2) {重名处理};
 
             \draw [arr] (start) -- (input);
             \draw [arr] (input) -- (find);
@@ -241,16 +242,15 @@
             \draw [arr] (cond) -- node[anchor=east] {是} (erase);
             \draw [arr] (erase) -- (input2);
             \draw [arr] (input2) -- (cond2);
-            \draw [arr] (cond2) --  node[anchor=east] {否} (add);
+            \draw [arr] (cond2) --  node[anchor=west] {否} (add);
             \draw [arr] (add) -- (end);
 
-            \draw [arr] (cond) -- ($(cond.east) + (0.9, 0)$) node[anchor = west] {否} |- ($ (end.north) + (0, 0.5) $);
-            \draw [arr] (cond2) -- ($(cond2.west) + (-0.5, 0)$) node[anchor = east] {是} |- ($ (cond2.north) + (0, 0.3) $);
+            \draw [arr] (cond) -- ($(cond.east) + (0.9, 0)$) node[anchor = west] {否} |- ($ (end.north) + (0, 0.3) $);
+            \draw [arr] (cond2) -- node[anchor=south] {是} (conf2);
+            \draw [arr] (conf2) |- ($(add.north) + (0, 0.3)$);
 
         \end{tikzpicture}
-        \caption{修改考生信息逻辑图\label{mod}}
+        \caption{修改现有成员名字流程图}
     \end{figure}
 }
 
-重点在于哈希表存放了{\kaishu <考号, 节点指针>}的键值对，所以在修改时如果要判断修改后考号是否重复，就要先将修改前考号的键值对抹去，这样在检查是否%
-重复考号时的哈希表才是有效的。修改完成后再将该{\kaishu <考号, 节点指针>}对加入回哈希表，完成一次修改。

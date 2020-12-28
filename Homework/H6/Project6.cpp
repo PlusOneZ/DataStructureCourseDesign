@@ -1,7 +1,3 @@
-//
-// Created by Zhengyi on 2020/12/3.
-//
-
 #include <limits>
 #include <iostream>
 #include <string>
@@ -23,35 +19,25 @@ class Vector {
 public:
     Vector();
     Vector(size_t num, const ElemType& d);
-
     Vector(const Vector<ElemType> &vec);
-
     ~Vector();
 
     void resize(size_t new_size);
-
     void reserve(size_t n);
 
     const ElemType &pop() const;
-
     void popBack();
-
     void pushBack(const ElemType &e);
 
     size_t length() const;
-
     bool isEmpty() const;
 
     void clear();
-
     void swap(Vector<ElemType> &another);
 
     ElemType &operator[](int index);
-
     const ElemType &operator[](int index) const;
-
     Vector &operator=(Vector<ElemType> const &another);
-
     std::ostream &show(std::ostream& os) const;
 
 protected:
@@ -83,7 +69,6 @@ Vector<ElemType>::Vector(size_t num, const ElemType &d) {
         Vector();
     }
 }
-
 
 template<class ElemType>
 Vector<ElemType>::~Vector() {
@@ -252,8 +237,8 @@ std::ostream &Vector<ElemType>::show(std::ostream &os) const {
 
 
 
-///------------------------- MultiTree --------------------------------------///
 
+///------------------------- MultiTree --------------------------------------///
 
 class MultiTreeException : public std::exception {
 public:
@@ -271,9 +256,8 @@ public:
     struct Node {
         Node(const Type& d, Node* par,
              Node * child = nullptr, Node * sib = nullptr) :
-                data(d), firstChild(child), sibling(sib), parent(par) {
-            // Empty
-        }
+                data(d), firstChild(child),
+                sibling(sib), parent(par) { }
         Type data;
         Node * firstChild;
         Node * sibling;
@@ -443,7 +427,9 @@ void MultiTree<Type>::showNode(MultiTree::Node *node, std::ostream &os) {
 
 template<class Type>
 MultiTree<Type>::~MultiTree() {
-    dismissSubTree(root);
+    Node temp("", nullptr, root, nullptr);
+    root->parent = &temp; root = &temp;
+    dismissSubTree(temp.firstChild);
     root = nullptr;
 }
 
@@ -886,7 +872,6 @@ public:
     inline void insert(const string& s, const Value& val);
     inline void insert(const MapPair& pair);
 
-
 private:
     HashTable<
             MapPair,
@@ -1009,6 +994,7 @@ void GenealogyTreeSystem::addChild() {
         cin >> n;
         while (cin.bad() || n <= 0) {
             clearInput(cin);
+            cin.ignore(std::numeric_limits<int>::max(), '\n');
             cout << "Invalid input, please input a positive integer: ";
             cin >> n;
         }
@@ -1082,12 +1068,19 @@ void GenealogyTreeSystem::rename() {
         string nName;
         getline(cin, nName);
         clearInput(cin);
-        while (name.empty() || cin.bad()) {
+        while (nName.empty() || cin.bad()) {
             cout << "Invalid input, please input non-empty characters: ";
             getline(cin, nName);
             clearInput(cin);
         }
-        regMap[name]->data = nName;
+        auto p = regMap[name];
+        p->data = nName;
+        regMap.erase(name);
+        if (regMap.hasKey(nName)){
+            nName = collisionHandle(nName);
+        }
+        regMap.insert(nName, p);
+        cout << name << " renamed to " << nName << endl;
     } else {
         cout << "Person not found." << endl;
     }
@@ -1110,15 +1103,19 @@ string GenealogyTreeSystem::collisionHandle(const string &name) {
     int n;
     if (collisionCount.hasKey(name)) {
         n = ++collisionCount[name];
-        while (collisionCount.hasKey(name + std::to_string(n))) {
+        while (regMap.hasKey(name + std::to_string(n))) {
             n = ++collisionCount[name];
         }
     } else {
         collisionCount.insert(name, 1);
         n = 1;
+        while (regMap.hasKey(name + std::to_string(n))) {
+            n = ++collisionCount[name];
+        }
     }
     string newName = name + std::to_string(n);
-    cout << "Same name! " << name << " renamed to " << newName << endl;
+    cout << "Same name! " << name
+         << " renamed to " << newName << endl;
     return newName;
 }
 
@@ -1166,4 +1163,6 @@ void GenealogyTreeSystem::showMenu() {
 int main() {
     GenealogyTreeSystem sys;
     sys.run();
+    cout << "Bye~" << endl;
+    return 0;
 }
