@@ -43,135 +43,106 @@ public:
 
 \section{正常情况}
 \begin{enumerate}
-    \item 创建系统数据表
+    \item 开始目录
 \begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4             -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE              -$
-    #2: 2345 Bob male 20 CS                   -$
-    #3: 3456 zzy m 20 DataStructure           -$
-    #4: 4567 miao pet 5 EatAndSleep           -$
-    Unidentified sex pet modified to 'unknown'
+    Welcome to Power Network Cost Simulating System, this is menu:
+    ***************************************************
+    **        Power Network Cost Simulating System   **
+    **-----------------------------------------------**
+    **         A.   Add vertexes to the net          **
+    **         B.     Add edge to the net            **
+    **         C. Generate minimum spanning tree     **
+    **         D.     Show solution tree             **
+    **         E.        Show Network                **
+    **         F.          Show menu                 **
+    **         G.            EXIT                    **
+    ***************************************************
     
-    Total 4 students added
-    No ID       Name        Sex     Age     Type of Examination
-    1. 1234     alice       female  20      SSE
-    2. 2345     Bob         male    20      CS
-    3. 3456     zzy         male    20      DataStructure
-    4. 4567     miao        unknown 5       EatAndSleep
-\end{lstlisting}
-可以看出，不合法的性别会被识别成 unknown。
-
-    \item 目录
-\begin{lstlisting}[style=console]
-    |***** Menu of Commands *****|
-    |  1: Insert      2: Delete  |
-    |  3: Find        4: Edit    |
-    |  5: Statistics  0: Exit    |
+    Enter Your first command: 
 \end{lstlisting}
 
-    \item 添加成员
+    \item 第一条指令：增加节点
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 1       -$
-    Enter the position of candidate: 1      -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    0123 Oscar m 21 Social                  -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 1234     alice       female   20      SSE
-    3. 2345     Bob         male     20      CS
-    4. 3456     zzy         male     20      DataStructure
-    5. 4567     miao        unknown  5       EatAndSleep
+    Enter Your first command: A
+    Enter amount of vertexes to add: 5
+    Enter Names of Vertexes separated by LINEBREAKS.
+    Empty line to quit.
+    #1: a
+    #2: b
+    #3: c
+    #4: d
+    #5:          // 空行
+    4 vertexes added successfully!
 \end{lstlisting}
+    可以看出，可以用空行打断输入。
 
-    \item 删除（按位置）
+    \item 添加边
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to remove: 4 -$
-    The candidate removed is: 
-    3456       zzy          male     20      DataStructure
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 1234    alice        female   20      SSE
-    3. 2345    Bob          male     20      CS
-    4. 4567    miao         unknown  5       EatAndSleep
+    Enter edges in the format below, end with LINEBREAKS, empty line to quit.
+    FORMAT: <vertex from> <vertex to> <weight> #LINEBREAK#
+    #1: a b 3
+    #2: b c 2
+    #3: c d 5
+    #4: a d 1000
+    #5:          // 空行
+    4 edges added successfully!
 \end{lstlisting}
+    同样也是用空行打断输入。
 
-    \item 插入（按考号）
+    \item 生成最小树
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 1234    -$
-    The candidate removed is: 
-    1234       alice        female   20      SSE
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 2345    Bob          male     20      CS
-    3. 4567    miao         unknown  5       EatAndSleep
+    Enter your next command: C
+
+    Enter starting point of tree, end with a LINEBREAK: d
+    d -> c
+    c -> b
+    b -> a
+    Tree successfully built, use command D to show.
+    Enter your next command: 
 \end{lstlisting}
+    可以选择开始节点，生成的过程会显示在输出中。
 
-    \item 用考号查找学生
+    \item 查看图
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 3       -$
-    Enter candidate's ID to find: 2345      -$
-    2345     Bob         male    20       CS
+    Enter your next command: E
+
+    Vertex a: [a] -(3)-> [b]		[a] -(1000)-> [d]		
+    Vertex b: [b] -(3)-> [a]		[b] -(2)-> [c]		
+    Vertex c: [c] -(2)-> [b]		[c] -(5)-> [d]		
+    Vertex d: [d] -(5)-> [c]		[d] -(1000)-> [a]		
 \end{lstlisting}
+    原始的图会按照存储结构展示
 
-    \item 修改学生信息（按位置）
+    \item 推出
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 3   -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    4567 miao m 16 EatAndWalk               -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
-\end{lstlisting}
+    Enter your next command: G
 
-    \item 统计
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 5       -$
-    Male: 3   Female: 0    Unknown: 0
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
-\end{lstlisting}
-
-    \item 结束
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 0       -$
     Bye~
 \end{lstlisting}
+
+    
 \end{enumerate}
 
-\vspace*{3cm}
 
 \section{输入异常}
 
 \begin{enumerate}
-    \item 创建系统数据表时直接中断
+    \item 输入相同名字节点
 \begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4           -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE            -$
-    #2: 2345 Bob male 20 CS                 -$
-    #3:                                     -$ // 输入回车
-    
-    Total 2 students added
-    No ID       Name        Sex       Age       Type of Examination
-    1. 1234     alice       female    20        SSE
-    2. 2345     Bob         male      20        CS
+    Enter Your first command: A
+    Enter amount of vertexes to add: 4
+    Enter Names of Vertexes separated by LINEBREAKS.
+    Empty line to quit.
+    #1: a
+    #2: a
+    Name a already exist, try again: 
+    #2: b
+    #3: c
+    #4: d
+    4 vertexes added successfully!
+    Enter your next command: 
 \end{lstlisting}
-    用回车可以中断输入。
+    会提示且不允许输入。
 
     \item 插入输入不存在的位置
 \begin{lstlisting}[style=console]
@@ -182,56 +153,42 @@ public:
 \end{lstlisting}
     位置不存在会提醒重新输入。
 
-    \item 删除：位置不存在
+    \item 添加端点为同一顶点的边
 \begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    6                                       -$
-    Try again, enter 1 / 2: 
-    1                                       -$
-    Enter candidate's position to remove: 6 -$
-    Invalid Index
-    Position 6 not found!
-
-    Enter your command, 6 for menu:  // ...
+    Enter edges in the format below, end with LINEBREAKS, empty line to quit.
+    FORMAT: <vertex from> <vertex to> <weight> #LINEBREAK#
+    #1: a a 1
+    Cannot create self link!
+    #1: a b 1
+    #2: 
+    1 edges added successfully!
 \end{lstlisting}
-    功能选择错误会提醒重新输入，位置不存在会有提示并退出。
+    不允许这么做
 
-\item 删除：考号不存在
+\item 给不完整的树生成最小树
 \begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 0000    -$
-    Candidate with ID 0000 not found!
+    Enter your next command: E
 
-    Enter your command, 6 for menu: // ...
+    Vertex a: [a] -(1)-> [b]		
+    Vertex b: [b] -(1)-> [a]		
+    Vertex c: Vertex dangling!
+    Vertex d: Vertex dangling!
+    
+    Enter your next command: C
+    
+    Enter starting point of tree, end with a LINEBREAK: a
+    a -> b
+    Tree not connected, building failed.
+    Enter your next command: 
 \end{lstlisting}
-    会给提示并退出。
+    显示树的时候会提示没有连接的悬挂顶点，生成失败给出信息。
 
-    \item 查找：找不到考号
+    \item 生成失败或是没有生成树时打印结果
 \begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 3
-    Enter candidate's ID to find: 
-    0000
-    Candidate with ID 0000 not found
-\end{lstlisting}
-    会给提示并退出。
+    Enter your next command: D
 
-    \item 修改学生信息：位置或考号不存在
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 6   -$
-    Invalid Index
-    Position 6 not found!
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to edit: 0000      -$
-    Candidate with ID 0000 not found!
+    Tree not ready, try build or complete the net first.
 \end{lstlisting}
-    与删除类似。
+    提示需要先生成。
 
 \end{enumerate}

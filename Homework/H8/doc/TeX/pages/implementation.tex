@@ -5,8 +5,8 @@
 下面按照一定的逻辑顺序介绍这几个类：
 
 \begin{itemize}
-    \item \lstinline{LinkedList} 类\\
-    链表类，存放顺序的学生名单结构。有 \lstinline{insert, remove, forEach} 方法用于插入、删除、遍历操作。
+    \item \lstinline{Graph 和 Vertex} 类和最小生成树函数\\
+    实现了图、顶点的封装。实现了Prim算法
     \item \lstinline{HashTable} 类\\
     其中维护了一个 \lstinline{HashNode} 的 \lstinline{Vector}，通过其哈希函数（\lstinline{hash function}）完成对\lstinline{Vector}%
     数组的索引。主要通过\lstinline{find} 和 \lstinline{hasKey}索引和判断键的存在与否，通过 \lstinline{insert} 方法插入一个键唯一的对象。%
@@ -19,68 +19,86 @@
     \lstinline{HashTable} 类用于存放\lstinline{HashNode}的数组，相同哈希值的对象会以链表的方式存放在这个数组的单元里。%
     在\lstinline{HashTable} 类的实现中主要用到了下标运算、\lstinline{reserve(n)} 方法：开辟 $n$ 长度的数组。\lstinline{resize(n)}%
     方法：重新分配 $n$ 长度的内存。
-    \item \lstinline{Student, System} 类\\
-    \lstinline{Student} 类是学生信息的封装，\lstinline{System} 类是交互系统实现，通过 \lstinline{run} 函数来开启，%
-    内部封装了指令显示、读取以及指令实现的函数。
+    \item \lstinline{PowerSystem} 类\\
+    封装了各种功能以及输入输出交互、算法。
 \end{itemize}
 
-该部分主要详细介绍\lstinline{LinkedList} 链表类和 \lstinline{HashTable} 哈希表类的实现，其余部分简单概括被使用的接口。
+该部分主要详细介绍\lstinline{Graph} 链表类和 \lstinline{HashTable} 哈希表类的实现，其余部分简单概括被使用的接口。
 
 
-\chapter{LinkedList 类}
+\chapter{Graph 类和 Vertex 类}
 
 \section{API}
 
 \subsection{类定义}
-以下是本题使用队列的 API，各函数的功能已用注释标出。
-\begin{lstlisting}[morendkeywords={LinkedList}, firstnumber=637, caption=LinkedList 类定义]{}
-template <class Type>
-class LinkedList {
+以下是本题使用顶点的 API。
+\begin{lstlisting}[morendkeywords={Vertex}, firstnumber=810, caption=Vertex 类定义]{}
+template<class Tag>
+class Vertex {
 public:
+    static constexpr int INF = std::numeric_limits<int>::max();
+    // 无穷大
+    Vertex<Tag>() = default;
+    explicit Vertex<Tag>(const Tag &t) : tag(t) {};
 
-    struct LinkNode {           // 嵌套节点类
-        LinkNode *prev = nullptr;
-        LinkNode *next = nullptr;
-        Type data;
+    Vertex<Tag> &find(const Tag &t) { // 找对应顶点
+        for (int i = 0; i < adjacents.length(); ++i) {
+            if (adjacents[i].tag == t) {
+                return adjacents[i];
+            }
+        }
+        throw GraphException("Adjacency not found");
+    }
 
-        LinkNode() = default;
-        explicit LinkNode(const Type &);
-    };
+    int weightTo(const Tag &t) { // 到节点的权重
+        for (int i = 0; i < adjacents.length(); ++i) {
+            if (adjacents[i]->tag == t) {
+                return weights[i];
+            }
+        }
+        return INF;
+    }
 
-    typedef LinkNode* Link;           // 别名
+    int weightTo(const Vertex &v) {
+        return weightTo(v.tag);
+    }
 
-    LinkedList();                     // 构造器
-    LinkedList(LinkedList const &);
-    ~LinkedList();
-
-    int length() const;               // 大小
-    bool isEmpty() const;             // 是否为空
-    Link getHead() const;             // 获取首节点
-    Link getTail() const;             // 获取尾节点
-    int search(const Type& x) const;  //搜索和谓词搜索
-    int searchByMethod(std::function<bool(Type&)> m);
-    Link locate(int i) const;         // 取索引
-    Link insert(int i, const Type& d);// 插入
-    Link insert(int i, Link link);    
-    Link insertTarget(Link tar, Link link);
-    Link insertBack(const Type& d);   // 后端插入
-    bool remove(int i, Type& d);      // 删除
-    bool remove(int i, Link link = nullptr);
-    bool removeTarget(Link link, Type& d);
-
-    void forEach(std::function<void(Type&)>);
-                                      // 对所有节点操作 
-
-protected:
-    Link head;
-    Link tail;
-    int elemNum = 0;
-
-    bool makeNode(Link &) const;      // 分配新节点
-    bool makeNode(Link &, const Type& x) const;
+    size_t index = 0;// 索引
+    Tag tag;         // 名字
+    Vector<Vertex *> adjacents;
+    Vector<int> weights;
 };
 \end{lstlisting}
-\vspace*{1cm}
+
+以下是本题使用图的 API。
+\begin{lstlisting}[morendkeywords={Graph}, firstnumber=847, caption=Graph 类定义]{}
+template<class VTag>
+class Graph {
+    template <class V> friend
+    Graph<V> minSpanningTree(Graph<V> &graph, const V& start);
+public:
+    static constexpr int INF = std::numeric_limits<int>::max();
+    // 无穷大
+    Graph() = default;
+    // 完善图的函数
+    inline void addEdge(const VTag &u, const VTag &v, int weight);
+    inline void addEdge(size_t u, size_t v, int weight);
+    inline void addVertex(const VTag& tag);
+
+    bool hasTag(const VTag& t) { return tagMap.hasKey(t); }
+    unsigned nodes() const { return numVertex; }
+    void reset() { vertexes.fill(Vertex<VTag>()); }
+    inline std::ostream &show(std::ostream &os);
+    inline std::ostream &showByVertexes(std::ostream &os);
+
+private:
+    size_t numVertex = 0;   // 顶点数
+    Vector<Vertex<VTag> *> vertexes;
+    HashMap<VTag, size_t> tagMap;
+};
+\end{lstlisting}
+
+
 
 {
 \lstset{
@@ -90,55 +108,26 @@ protected:
     }
 \subsection{公开成员}
 \begin{enumerate}
-    \item \lstinline{Link insertTarget(Link tar, Link link);}
-          插入在 \lstinline{tar} 后面。返回插入节点的指针。该函数有两个托管函数，通过位置 $i$ 来索引节点。
-    \item \lstinline{bool removeTarget(Link link, Type& d);}
-          删除 \lstinline{tar} 节点。返回是否成功。该函数有两个托管函数，通过位置 $i$ 来索引节点。
-    \item \lstinline{Link locate(int i) const;} \\
-          从位置$i$取出一个节点，如果没有节点则报错并返回 \lstinline{nullptr}。
-    \item \lstinline{int search(const Type& x) const;} \\
-          遍历找到值为 \lstinline{x} 的节点的位置，找不到返回-1。
-    \item \lstinline{int searchByMethod(std::function<bool(Type&)> method);} \\
-          返回第一个 \lstinline{method} 函数返回值为 \lstinline{true} 的节点的位置，找不到返回-1.
-    \item \lstinline{void forEach(std::function<void(Type&)> op);} \\
-          对每个元素都调用操作 \lstinline{op}，可以用于格式打印等操作。
+    \item \lstinline{void addEdge(size_t u, size_t v, int weight);}
+          添加两个顶点（下标索引）之间的一条边。
+    \item \lstinline{void addEdge(const VTag &u, const VTag &v, int weight);}
+          添加两个顶点（顶点名索引）之间的一条边。
+    \item \lstinline{void addVertex(const VTag& tag);} \\
+          添加一个顶点。
 \end{enumerate}
 
 \subsection{私有成员}
 \begin{enumerate}
-    \item \lstinline{Link head; Link tail;} \\
-          该链表的头节点和尾节点。
-    \item \lstinline{int elemNum = 0;} \\
-          链表中现有元素的个数。
-    \item \lstinline{bool makeNode(Link &, const Type& x) const;} \\
-          用 $x$ 的值来分配并初始化一个新的节点，失败返回 \lstinline{nullptr}。
+    \item \lstinline{size_t VerTex::index = 0;} \\
+          与 Graph 中该顶点被存在 vertexes 数组中的位置相对应。
+    \item \lstinline{Vector<Vertex<VTag> *> Graph::vertexes;} \\
+          图的顶点，下标是唯一指定可以用来索引的值。
+    \item \lstinline{HashMap<VTag, size_t> Graph::tagMap;} \\
+          用来将顶点名字与下标一一对应的map。
 \end{enumerate}
 }
 
 \section{代码逻辑与实现}
-
-\subsection{逻辑描述}
-
-
-双链表中，最主要改变其结构的动作是 {\kaishu 插入} 和 {\kaishu 删除}，因此要说明这两个部分的内容。
-
-插入节点时，先找到这个节点的前驱（后继向前走一格便是前驱），然后做按照顺序对目标节点操作：
-
-\begin{itemize}
-    \item 目标节点的后继指针指向前驱的后继，目标节点的前驱指针指向前驱；
-    \item 前驱的后继指针指向目标；
-    \item 后继的前驱指针指向目标。
-\end{itemize}
-
-删除节点时，先找到这个目标节点，然后按照顺序对目标节点操作：
-\begin{itemize}
-    \item 目标的前驱的后继指针指向目标的后继。
-    \item 目标的后继的前驱指针指向目标的前驱。
-    \item 释放目标的内存。
-\end{itemize}
-
-
-\subsection{代码实现}
 
 {
 \lstset{
@@ -146,36 +135,38 @@ protected:
       morendkeywords = {head, tail, elemNum}
 }
 \begin{enumerate}
-      \item 插入到目标后
-\begin{lstlisting} [firstnumber = 792, caption={LinkedList::insertTarget}]
-template<class Type>
-typename LinkedList<Type>::Link
-LinkedList<Type>::insertTarget(LinkedList::Link target, LinkedList::Link link) {
-    if (target == nullptr) {
-        return nullptr;
-    }
-    link->next = target->next;
-    link->next->prev = link;
-    target->next = link;
-    link->prev = target;
-    ++elemNum;
-    return link;
-} \end{lstlisting}
-      \item 删除目标节点
-\begin{lstlisting} [firstnumber = 829, caption={LinkedList::removeTarget}]
-template<class Type>
-bool LinkedList<Type>::removeTarget(Link link, Type& d) {
-    d = link->data;
-    link->prev->next = link->next;
-    link->next->prev = link->prev;
+      \item 增加边
+\begin{lstlisting} [firstnumber = 881, caption={Graph::addEdge}]
+template<class VTag>
+void Graph<VTag>::addEdge(size_t u, size_t v, int weight) {
+    if (u == v) // self looping not allowed
+        return;
     try {
-        delete link;
-    } catch (std::exception& e) {
-        return false;
+        for (int i = 0; i < vertexes[u]->adjacents.length(); ++i) {
+            if (vertexes[u]->adjacents[i]->index == v)
+                cout << "Multiple edges between "
+                     "two vertexes, making Multi-graph.\n";
+        }
+        vertexes[u]->adjacents.pushBack(vertexes[v]);
+        vertexes[u]->weights.pushBack(weight);
+        vertexes[v]->adjacents.pushBack(vertexes[u]);
+        vertexes[v]->weights.pushBack(weight);
+    } catch (IllegalVectorAccessing &e) {
+        throw GraphException("Vertexes out of range");
     }
-    --elemNum;
-    return true;
-}\end{lstlisting}
+} \end{lstlisting}
+      \item 增加边
+\begin{lstlisting} [firstnumber = 829, caption={LinkedList::removeTarget}]
+template<class VTag>
+void Graph<VTag>::addVertex(const VTag &tag) {
+    if (tagMap.hasKey(tag)) // 不允许同名
+        throw GraphException("Same tag not allowed");
+    auto v = new Vertex<VTag>(tag);
+    v->index = vertexes.length();
+    tagMap.insert(tag, vertexes.length());
+    vertexes.pushBack(v);
+    numVertex++;
+} \end{lstlisting}
       
 \end{enumerate}
 }
@@ -189,7 +180,7 @@ bool LinkedList<Type>::removeTarget(Link link, Type& d) {
 \subsection{类定义}
 {
 \lstset{morendkeywords={HashTable}}
-\begin{lstlisting}[firstnumber=283, caption=HashTable 类定义]{}
+\begin{lstlisting}[firstnumber=435, caption=HashTable 类定义]{}
 template<class ValueType, class Key, class HashFunction,
         class ExtractKey, class EqualKey>
 class HashTable {
@@ -314,7 +305,7 @@ C++ STL 的哈希表采用了“开链”方式组织解决冲突。“开链”
 \begin{itemize}
       \item \lstinline{ValueType &HashTable<..>::find(const Key &k)}\\
             找到 \lstinline{key} 的值。
-\begin{lstlisting} [firstnumber=446]
+\begin{lstlisting} [firstnumber=598]
 template<..>
 ValueType &
 HashTable<..>::
@@ -331,7 +322,7 @@ find(const Key &k) {
 }\end{lstlisting}
       \item \lstinline{bool HashTable<..>::insertUnique(const ValueType &obj);} \\
             插入一个值。
-\begin{lstlisting}[escapechar=^, firstnumber=409]
+\begin{lstlisting}[escapechar=^, firstnumber=561]
 template<..>
 bool
 HashTable<..>::
@@ -362,7 +353,7 @@ insertUnique(const ValueType &obj) {
 
 \subsection{Pair 类定义}
 \lstset{morendkeywords={Pair}}
-\begin{lstlisting}[firstnumber=551, caption=Pair 类定义]{}
+\begin{lstlisting}[firstnumber=699, caption=Pair 类定义]{}
 template<class First, class Second>
 struct Pair {
     typedef First firstType;
@@ -384,37 +375,34 @@ struct Pair {
 };
 \end{lstlisting}
 
-\subsection{StringHashMap 类定义}
+\subsection{HashMap 类定义}
 \lstset{morendkeywords={Pair}}
-\begin{lstlisting}[firstnumber=586, caption=StringHashMap 类定义]{}
-template<class Value>
-class StringHashMap {
+\begin{lstlisting}[firstnumber=734, caption=HashMap 类定义]{}
+template <class Key, class Value>
+class HashMap {
 public:
-    typedef Pair<string, Value> MapPair; // 别名
-
-    StringHashMap() : ht(50) { }
-    // 委托调用
+    typedef Pair<Key, Value> MapPair;
+    HashMap() : ht(50) { }
     size_t size() const { return ht.bucketCount(); }
     size_t maxSize() const { return ht.maxBucketNum(); }
     bool empty() const { return ht.empty(); }
-    
-    inline Value &operator[](const string &s);
-    MapPair &find(const string &s) { return ht.find(s); }
-    const MapPair &find(const string &s) const { return ht.find(s); }
-    bool hasKey(const string &s) { return ht.hasKey(s); }
-    size_t erase(const string& key) { return ht.erase(key); }
+
+    inline Value &operator[](const Key &key);
+    MapPair &find(const Key &key) { return ht.find(key); }
+    const MapPair &find(const Key &key) const { return ht.find(key); }
+    bool hasKey(const Key &key) { return ht.hasKey(key); }
+    size_t erase(const Key& key) { return ht.erase(key); }
     void resize(size_t hint) { ht.resize(hint); }
-    inline void insert(const string& s, const Value& val);
+    inline void insert(const Key& s, const Value& val);
     inline void insert(const MapPair& pair);
 
-
-private:    // 用模板参数具体化 HashTable
+private:// 用模板参数具体化 HashTable
     HashTable<
             MapPair,
-            string,
-            Hash<string>,
-            GetPairKey<MapPair, string>,
-            Equals<string> > ht;
+            Key,
+            Hash<Key>,
+            GetPairKey<MapPair, Key>,
+            Equals<Key> > ht;
 };
 \end{lstlisting}
 
@@ -425,34 +413,32 @@ private:    // 用模板参数具体化 HashTable
 
 一个处理逻辑和与外界交互的封装类，存放学生信息并用上述结构完成了题目要求的功能。
 
-\subsection{System 类定义}
+\subsection{PowerSystem 类定义}
 \lstset{morendkeywords={Pair}}
 \begin{lstlisting}[firstnumber=986, caption=System 类定义]{}
-class System {
-    typedef LinkedList<Student>::Link Link;
+class PowerSystem {
+    enum Command {
+        CreatVertex, CreatEdge, BuildTree, ShowTree, ShowGrid, ShowMenu, Exit
+    };
 public:
-    enum Command { kQuit, kInsert, kDelete, kFind, kModify, kStatistic, kMenu };
-    System();
     void run();
 
-protected:
-    static void menu(); // 展示目录
-    int readCommand();  // 读指令
-    void insert();      // 插入
-    void remove();      // 删除
-    void find();        // 查找
-    void modify();      // 修改
-    void statistic();   // 统计
-    void show(int option = 0);//显示
-    void statAdd(const Student &s);
-    void statSub(const Student &s);
-                        // 统计用
-    LinkedList<Student> list;
-    StringHashMap<Link> hashMap;
-    long long maleCnt = 0;
-    long long femaleCnt = 0;
+private:
+    Graph<string> graph;
+    Graph<string> minSpanTree;
+    bool treeOK = false;
+
+    bool parseCommand(const string &c);
+
+    void createVertex();
+    void createEdge();
+    void buildTree();
+    void showTree();
+    void showGrid();
+    static void showMenu();
+
+    static void clearIStream(std::istream &is);
 };
 \end{lstlisting}
 
-封装的具体代码涉及到许多繁琐的输入输出操作，这里不予展示，可以参照图\ref{add}、\ref{del}、\ref{find}、\ref{mod}的内容%
-理解其工作逻辑。
+封装的类涉及了添加节点、添加边、生成树、展示树、展示图、展示目录等功能。将在下一部分展示目录和功能。

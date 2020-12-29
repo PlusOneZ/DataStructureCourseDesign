@@ -811,10 +811,12 @@ template<class Tag>
 class Vertex {
 public:
     static constexpr int INF = std::numeric_limits<int>::max();
+
     Vertex<Tag>() = default;
+
     explicit Vertex<Tag>(const Tag &t) : tag(t) {};
 
-    Vertex<Tag>& find(const Tag &t) {
+    Vertex<Tag> &find(const Tag &t) {
         for (int i = 0; i < adjacents.length(); ++i) {
             if (adjacents[i].tag == t) {
                 return adjacents[i];
@@ -972,7 +974,7 @@ Graph<V> minSpanningTree(Graph<V> &graph, const V& start) {
         Edge(int v1, int v2, int w) : from(v1), to(v2), weight(w) {};
         Edge() = default;
 
-        bool operator<(const Edge &E) const { return weight < E.weight; };
+        bool operator<(const Edge &e) const { return weight < e.weight; };
         int from, to;
         int weight;
     };
@@ -1018,7 +1020,7 @@ Graph<V> minSpanningTree(Graph<V> &graph, const V& start) {
             size_t nextIndex = graph.vertexes[curIndex]->adjacents[i]->index;
             int nextWeight = graph.vertexes[curIndex]->weights[i];
             if (rec[nextIndex].jointed) continue;
-            if (rec[nextIndex].weight > nextIndex) {
+            if (rec[nextIndex].weight > nextWeight) {
                 rec[nextIndex].prevVer = curIndex;
                 rec[nextIndex].weight = nextWeight;
                 edgeHeap.push(Edge(curIndex, nextIndex, nextWeight));

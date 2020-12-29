@@ -13,16 +13,16 @@ add_executable(DataStructure
 #        tests/test1.cpp
 #        tests/test2.cpp
 
-#        Homework/H1/Project1.cpp
-#        Homework/H2/Project2.cpp
-#        Homework/H3/Project3.cpp
-#        Homework/H4/Project4.cpp
-#        Homework/H5/Project5.cpp
-#        Homework/H6/Project6.cpp
-#        Homework/H7/Project7.cpp
-        Homework/H8/Project8.cpp
-#        Homework/H9/Project9.cpp
-#        Homework/H10/Project10.cpp
+#        Homework/H1/src/Project1.cpp
+#        Homework/H2/src/Project2.cpp
+#        Homework/H3/src/Project3.cpp
+#        Homework/H4/src/Project4.cpp
+#        Homework/H5/src/Project5.cpp
+#        Homework/H6/src/Project6.cpp
+#        Homework/H7/src/Project7.cpp
+        Homework/H8/src/Project8.cpp
+#        Homework/H9/src/Project9.cpp
+#        Homework/H10/src/Project10.cpp
 
 #        MyDS/Vector.cpp
 #        MyDS/Vector.h
