@@ -1,6 +1,3 @@
-//
-// Created by Zhengyi on 2020/12/20.
-//
 
 #include "../../MyDS/Vector.h"
 #include <random>

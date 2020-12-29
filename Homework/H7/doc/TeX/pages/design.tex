@@ -1,256 +1,51 @@
 
 \chapter{背景分析}
 
-考试报名工作给各高校报名工作带来了新的挑战，给教务管理部门增加了很大的工作量。随着信息时代的来临，手动输入管理考生的信息效率低下%
-且容易出错，管理起来十分不便。如何快速地处理大规模的数据以及频繁的查询，是当今考试报名系统需要解决的关键问题。
+农夫要修理牧场的一段栅栏，他测量了栅栏，发现需要$N$块木头，每块木头长度为整数$L_i$个%
+长度单位，于是他购买了一个很长的，能锯成$N$块的木头，即该木头的长度是$L_i$的总和。
 
-使用使用计算机技术来进行考试信息的维护和管理，其具有管理容量上限高，管理快速，成本低等多个巨大优势，能极大提升考试报名管理的效率。%
-本项目是对考试报名管理系统的简单模拟，系统主要有以下功能：输出考生信息、查询考生信息、添加考生信息、修改考生信息和删除考生信息。
-
-系统需要维护一个内存中的报名表，表中包含的信息有准考证号，姓名，性别，年龄和报考类别等。并能够通过准考证号查询到考生，指定修改信息、%
-删除等功能。
-
-
+但是农夫自己没有锯子，请人锯木的酬金跟这段木头的长度成正比。为简单起见，不妨就%
+设酬金等于所锯木头的长度。例如，要将长度为$20$的木头锯成长度为$8$，$7$和$5$的三段，第一次%
+锯木头将木头锯成$12$和$8$，花费$20$；第二次锯木头将长度为$12$的木头锯成$7$和$5$花费$12$，%
+总花费$32$元。如果第一次将木头锯成$15$和$5$，则第二次将木头锯成$7$和$8$，那么总的花费是$35$（大于$32$）.
 
 
 \chapter{功能设计}
 
 \section{题意转化}
-依据题意，需要使用一个数据结构将学生信息存储起来，并能做到{\kaishu 增、删、查、改}四个功能。有许多数据结构都能做到这项功能%
-简单的有、{\kaishu 线性表}，如数组、链表等结构，复杂的有哈希表，以及二叉查找树、平衡二叉树等非线性结构。%
-本题使用了{\kaishu 双链表}作为主要的数据结构储存信息，双链表的数据组织如下图。
 
-\newcommand{\data}{
-      data \nodepart{second}
-      \phantom{\texttt{NULL}}
-    }
+切割一根木头，每个目标木头长度的开销都至少计算一次，而有些木头的长度可能被计算多次。%
+所以总体上来看需要避免对长的木头进行多次操作。而尽可能地通过把短的木头锯多次来达到目的。%
+
+自底向上看，怎么让短木头被锯多次而长木头锯少次，重点在于怎么将目标木头两两组合成更长的目标木头%
+作为中间产物计算。每次将最短的两根木头进行结合，将结合后的木头算入目标中，再取最短两根，这样的做法%
+可以使越短的木头使用次数越多，而长的木头则会更迟结合，更少被使用。
+
+所以项目需要一个可以维持元素顺序的数据结构，满足每次取出元素时都能取出最小的元素。{\kaishu 最小堆}可以满足这种特性，%
+因此本项目就是用了最小堆这一数据结构。
+
+\forestset{ 
+  default preamble={ 
+    for tree={circle,draw, minimum width=0.8cm} 
+  } 
+} 
 
 \begin{figure}[H]
-    \tikzstyle{ptr}  = [draw, -{Stealth[scale=1.0]}, blue]
-    \tikzstyle{head} = [rectangle, draw, text height=3mm, text width=3mm,
-                        text centered, node distance=3cm, inner sep=0pt]
-    \tikzstyle{data} = [rectangle split, rectangle split parts=3, draw, node distance=2.5cm, 
-                        text centered, minimum height=3em]
     \centering
-    \begin{tikzpicture} [node distance=2cm, auto]
-    \node[data, node distance=2.5cm] (A) {data \nodepart{third} \footnotesize{nullptr}};
-    \node[data, right of=A] (B) {\data};
-    \node[data, right of=B] (C) {\data};
-    \node[data, right of=C] (D) {\data};
-    \node[data, right of=D] (E) {\data};
-    \node[data, right of=E, node distance=2.5cm] (last) {data \nodepart{second} \footnotesize{nullptr}};
-    
-    \draw[fill] ($(A.south)!0.67!(A.text split)$) circle (0.05);
-    \draw[ptr] ($(A.south)!0.67!(A.text split)$) --++(right:10mm) |- ($(B.south west)!0.67!(B.text split west)$);
-    \draw[fill] ($(B.south)!0.67!(B.text split)$) circle (0.05);
-    \draw[ptr] ($(B.south)!0.67!(B.text split)$) --++(right:10mm) |- ($(C.south west)!0.67!(C.text split west)$);
-    \draw[fill] ($(C.south)!0.67!(C.text split)$) circle (0.05);
-    \draw[ptr] ($(C.south)!0.67!(C.text split)$) --++(right:10mm) |- ($(D.south west)!0.67!(D.text split west)$);
-    \draw[fill] ($(D.south)!0.67!(D.text split)$) circle (0.05);
-    \draw[ptr] ($(D.south)!0.67!(D.text split)$) --++(right:10mm) |- ($(E.south west)!0.67!(E.text split west)$);
-    \draw[fill] ($(E.south)!0.67!(E.text split)$) circle (0.05);
-    \draw[ptr] ($(E.south)!0.67!(E.text split)$) --++(right:10mm) |- ($(last.south west)!0.67!(last.text split west)$);
-
-    \draw[fill] ($(B.south)!0.3!(B.text split)$) circle (0.05);
-    \draw[ptr] ($(B.south)!0.3!(B.text split)$) --++(left:10mm) |- ($(A.south east)!0.3!(A.text split east)$);
-    \draw[fill] ($(C.south)!0.3!(C.text split)$) circle (0.05);
-    \draw[ptr] ($(C.south)!0.3!(C.text split)$) --++(left:10mm) |- ($(B.south east)!0.3!(B.text split east)$);
-    \draw[fill] ($(D.south)!0.3!(D.text split)$) circle (0.05);
-    \draw[ptr] ($(D.south)!0.3!(D.text split)$) --++(left:10mm) |- ($(C.south east)!0.3!(C.text split east)$);
-    \draw[fill] ($(E.south)!0.3!(E.text split)$) circle (0.05);
-    \draw[ptr] ($(E.south)!0.3!(E.text split)$) --++(left:10mm) |- ($(D.south east)!0.3!(D.text split east)$);
-    \draw[fill] ($(last.south)!0.3!(last.text split)$) circle (0.05);
-    \draw[ptr] ($(last.south)!0.3!(last.text split)$) --++(left:10mm) |- ($(E.south east)!0.3!(E.text split east)$);
-    
-    
-    \end{tikzpicture}
-    \caption{双链表结构示意图}
+    \begin{forest}
+        [9 [17 [23 [53] [31]] [45] ] [65 [78] [87]]]
+    \end{forest}
+    \caption{最小堆示意}
 \end{figure}
 
-通过单向访问节点可以增加、修改、删除一个节点，这三个操作的时间复杂度均为 $O(1)$ 级别的，而查找某个节点的时间复杂度是 $O(n)$ 级别的。%
-由于查找操作在一个考试系统中较为频繁的出现，所以在用链表储存有序的考生名单的基础上，我决定加用{\kaishu 哈希表}\emph{(Hash Table)}辅助进行查找，%
-哈希表的插入和删除时间复杂度均可看作 $O(1)$ 级别，其特点是空间复杂度为 $\Omega(n)$\footnote{$\Omega$ 为下界}，其中 $n$ 为存储%
-在表内的数据数量。本项目中，哈希表存放的是{\kaishu <考号, 节点指针>}的键值对。
+最小堆的结构特点是：所含有的节点元素大小\textbf{小于}自己的子女节点。
 
-{
-\begin{figure}[H]
-    \tikzset{
-        listnode/.style={
-            rectangle split,rectangle split parts=2,draw,rectangle split horizontal,fill=blue!20
-        },
-        startnode/.style={
-            draw,minimum width=1.5cm,minimum height=.75cm
-        }
-    }
-    \centering
-    \begin{tikzpicture}[scale=.2, >=stealth]
-        \node[startnode] (t0) {$T[0]$};
-        \node[startnode,below=0pt of t0] (t1) {$T[1]$};
-        \node[startnode,below=0pt of t1] (t2) {$T[2]$};
-        \node[startnode,below=0pt of t2] (t3) {$T[3]$};
-        \node[startnode,below=0pt of t3] (t4) {$T[4]$};
-        \node[startnode,below=0pt of t4] (t5) {$T[5]$};
-        \node[listnode,right=of t0] (3) {3};
-        \node[listnode,right=of t1] (1) {1};
-        \node[listnode,right=of t2] (2) {2};
-        \node[listnode,right=of t5] (13) {13};
-        \node[listnode,right=.5cm of 2] (5) {5};
-        \node[listnode,right=.5cm of 5] (8) {8};
-        \node[right=.5cm of 3] (3x) {$\varnothing$};
-        \node[right=.5cm of 1] (7x) {$\varnothing$};
-        \node[right=.5cm of 8] (8x) {$\varnothing$};
-        \node[right=1cm of t3] (3xx) {$\varnothing$};
-        \node[right=1cm of t4] (4xx) {$\varnothing$};
-        \node[right=.5cm of 13] (13x) {$\varnothing$};
-        \draw[*->] let \p1 = (3.two), \p2 = (3.center) in (\x1,\y2) -- (3x);
-        \draw[*->] let \p1 = (1.two), \p2 = (1.center) in (\x1,\y2) -- (7x);
-        \draw[*->] let \p1 = (2.two), \p2 = (2.center) in (\x1,\y2) -- (5);
-        \draw[*->] let \p1 = (5.two), \p2 = (5.center) in (\x1,\y2) -- (8);
-        \draw[*->] let \p1 = (8.two), \p2 = (8.center) in (\x1,\y2) -- (8x);
-        \draw[*->] let \p1 = (13.two), \p2 = (13.center) in (\x1,\y2) -- (13x);
-        \draw[->] (t0) edge (3) (t1) edge (1) (t2) edge (2) (t3) edge (3xx) (t4) edge (4xx) (t5) edge (13);
-    \end{tikzpicture}
-        \caption{哈希表结构示意图\label{hash}}
-\end{figure}
-}
+这个结构特点通过小于关系的传递性传递到根节点，于是根节点是整棵树中元素值最小的节点。%
+文档将在实现部分描述堆的存储和实现。
 
-\vspace*{1.0cm}
 
 \section{逻辑功能}
-{\kaishu 增、删}功能对应于双链表结构中的{\kaishu 插入、删除}功能，哈希表优化后的{\kaishu 查找}功能通过%
-哈希表的{\kaishu 查询（或索引）}功能实现。{\kaishu 修改}功能则是查找和赋值的结合。四种操作都十分简单。
 
-但由于考试报名系统中维护了一个顺序的双链表和一个哈希表，在{\kaishu 增、删、改}这三个需要改变数据的操作中，%
-在修改链表数据的{\kaishu 同时}一起修改哈希表当中的数据是十分必要的。因此，逻辑重点在于同时维护两套数据并使系统正常工作。
+切木头问题的解法十分简单：将所有木头长度加入最小堆，每次取出两个最小元素相加得到长度 $l$，总花费 $cost += l$，%
+并将 $l$ 压入堆中，再重复取出两个元素和之后的动作，直到堆中只有一个元素，$cost$ 就是需要的总花费。
 
-\section{维护两套数据}
-
-\tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 2cm, 
-        minimum height=1cm, text centered, draw = black, fill = red!40,
-        font = {\bfseries}]
-    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, 
-    minimum width=2cm, minimum height=1cm, text centered, draw=black, fill = blue!40]
-    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill = yellow!50]
-    \tikzstyle{condition} = [diamond, aspect = 3, text centered, draw=black, fill = green!30]
-    \tikzstyle{arr} = [->, >=stealth, thick]
-
-\subsection{增加信息}
-增加操作是最简单的操作，流程图如下：
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {读取到 \lstinline{S}};
-            \node [condition, below=1cm of input] (cond) {\lstinline{S} 考号已经存在？};
-            \node [process, below=.7cm of cond] (toList) {\lstinline{S} 加入链表};
-            \node [process, below=.6cm of toList] (toMap) {\lstinline{S} 加入哈希表};
-            \node [startstop, below=.6cm of toMap] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- node[anchor=west] {否} (toList);
-            \draw [arr] (toList) -- (toMap);
-            \draw [arr] (toMap) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.5, 0)$) node[anchor = west] {是} |- ($ (cond.north) + (0, 0.5) $);
-
-        \end{tikzpicture}
-        \caption{添加考生信息逻辑图\label{add}}
-    \end{figure}
-}
-
-
-\subsection{删除信息}
-删除与增加类似，流程图如下：
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [condition, below=.7cm of input] (cond) {\lstinline{num} 考号存在？};
-            \node [process, left=1.3cm of cond] (toList) {\lstinline{S} 从链表删除};
-            \node [process, below=.6cm of toList] (toMap) {\lstinline{S} 从哈希表抹去};
-            \node [io, right=1.3cm of toMap] (out) {输出出考生信息};
-            \node [startstop, below=1cm of out] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- node[anchor=north] {是} (toList);
-            \draw [arr] (toList) -- (toMap);
-            \draw [arr] (toMap) -- (out);
-            \draw [arr] (out) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.9, 0)$) node[anchor = west] {否} |- ($ (end.north) + (0, 0.5) $);
-
-        \end{tikzpicture}
-        \caption{删除考生信息逻辑图\label{del}}
-    \end{figure}
-}
-
-\subsection{查找考生信息}
-通过调用哈希表的查询方法可以很快的找到考生并输出信息，流程图如下：
-
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [condition, below=.7cm of input] (cond) {\lstinline{S} 考号存在？};
-            \node [process, below=.7cm of cond, xshift=-2.75cm] (find) {找到考生};
-            \node [io, below=.7cm of find] (out) {输出考生信息};
-            \node [io, below=.7cm of cond, xshift=2.75cm] (outErr) {输出错误提示};
-            \node [startstop, below=.6cm of out, xshift=2.5cm] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- ($(cond.west) + (-0.5, 0)$) node[anchor=east] {是} -- (find.north);
-            \draw [arr] (find) -- (out);
-            \draw [arr] (out) -- (end);
-            \draw [arr] (outErr) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.5, 0)$) node[anchor = west] {否} -- (outErr.north);
-
-        \end{tikzpicture}
-        \caption{查询考生信息逻辑图\label{find}}
-    \end{figure}
-}
-
-\subsection{修改考生信息}
-修改考生信息除了要先找到考生之外，还有一些对哈希表操作的细节。流程图如下：
-
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [process, below=.7cm of input] (find) {用 \lstinline{num} 查询考生 \lstinline{S}};
-            \node [condition, below=.7cm of find] (cond) {\lstinline{S} 不为空？};
-            \node [process, below=.8cm of cond] (erase) {\lstinline{S} 从哈希表抹去};
-            \node [io, below=.7cm of erase] (input2) {读取到 \lstinline{S}};
-            \node [condition, below=.6cm of input2] (cond2) {\lstinline{S} 考号已经存在？};
-            \node [process, below=.8cm of cond2] (add) {\lstinline{S} 加入哈希表};
-            \node [startstop, below=.8cm of add] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (find);
-            \draw [arr] (find) -- (cond);
-            \draw [arr] (cond) -- node[anchor=east] {是} (erase);
-            \draw [arr] (erase) -- (input2);
-            \draw [arr] (input2) -- (cond2);
-            \draw [arr] (cond2) --  node[anchor=east] {否} (add);
-            \draw [arr] (add) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.9, 0)$) node[anchor = west] {否} |- ($ (end.north) + (0, 0.5) $);
-            \draw [arr] (cond2) -- ($(cond2.west) + (-0.5, 0)$) node[anchor = east] {是} |- ($ (cond2.north) + (0, 0.3) $);
-
-        \end{tikzpicture}
-        \caption{修改考生信息逻辑图\label{mod}}
-    \end{figure}
-}
-
-重点在于哈希表存放了{\kaishu <考号, 节点指针>}的键值对，所以在修改时如果要判断修改后考号是否重复，就要先将修改前考号的键值对抹去，这样在检查是否%
-重复考号时的哈希表才是有效的。修改完成后再将该{\kaishu <考号, 节点指针>}对加入回哈希表，完成一次修改。

@@ -5,6 +5,10 @@
 #include <sstream>
 #include <string>
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
+
 ///--------------------------------- Vector ---------------------------------///
 
 class IllegalVectorAccessing : public std::exception {

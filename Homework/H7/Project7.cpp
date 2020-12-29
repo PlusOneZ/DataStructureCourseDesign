@@ -4,6 +4,10 @@
 #include <string>
 #include <sstream>
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
+
 using std::string;
 
 ///-------------------------- Vector ----------------------------------------///

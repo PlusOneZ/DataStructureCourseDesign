@@ -3,6 +3,10 @@
 #include <limits>
 #include <sstream>
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
+
 using std::string;
 
 /// -------------------------- Cyclic queue -------------------------------- ///

@@ -1,6 +1,9 @@
 #include <iostream>
 #include <exception>
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
 
 ///------------------------------- Stack ------------------------------------///
 class PeekingEmptyError : public std::exception {

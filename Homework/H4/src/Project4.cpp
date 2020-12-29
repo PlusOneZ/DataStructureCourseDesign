@@ -1,8 +1,13 @@
-
+#include <cstring>
 #include <string>
 #include <iostream>
 #include <exception>
 #include <utility>
+#include <algorithm>
+
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
 
 using std::string;
 

@@ -3,6 +3,11 @@
 #include <string>
 #include <exception>
 #include <cstring>
+
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
+
 using std::string;
 
 ///------------------------------ Vector ------------------------------------///

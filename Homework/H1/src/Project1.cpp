@@ -5,6 +5,10 @@
 #include <exception>
 #include <cstring>
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
+
 ///-------------------------------- Vector ----------------------------------///
 
 
@@ -1211,7 +1215,6 @@ void System::find() {
     cin >> canNum;
     cin.clear();
     cin.ignore(numeric_limits<std::streamsize>::max(), '\n');
-    int pos;
     if (!hashMap.hasKey(canNum)) {
         cout << "Candidate with ID " << canNum << " not found" << endl;
     } else {

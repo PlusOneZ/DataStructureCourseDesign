@@ -6,6 +6,10 @@
 #include "../../MyDS/HashMap.h"
 #include "../../MyDS/Queue.h"
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
+
 using std::string;
 
 class GraphException : public std::exception {
