@@ -47,5 +47,42 @@
 \section{逻辑功能}
 
 切木头问题的解法十分简单：将所有木头长度加入最小堆，每次取出两个最小元素相加得到长度 $l$，总花费 $cost += l$，%
-并将 $l$ 压入堆中，再重复取出两个元素和之后的动作，直到堆中只有一个元素，$cost$ 就是需要的总花费。
+并将 $l$ 压入堆中，再重复取出两个元素和之后的动作，直到堆中只有一个元素，$cost$ 就是需要的总花费。以下是流程图：
+
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 2cm, 
+        minimum height=1cm, text centered, draw = black, fill = red!40,
+        font = {\bfseries}]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, 
+    minimum width=2cm, minimum height=1cm, text centered, draw=black, fill = blue!40]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill = yellow!50]
+\tikzstyle{condition} = [diamond, aspect = 3, text centered, draw=black, fill = green!30]
+\tikzstyle{arr} = [->, >=stealth, thick]
+  
+{
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}
+            \node (start) [startstop]  {开始，\lstinline{cost = 0}};
+            \node [io, below=.6cm of start] (input) {输入长度并压入堆 \lstinline{heap}};
+            \node [condition, below=.6cm of input] (hash) {\lstinline{heap} 中只剩一个元素？};
+            \node [process, below=.6cm of hash] (get) {\lstinline{heap} 中取两个元素 \lstinline{a, b}};
+            \node [process, below=.6cm of get] (cond1) {\lstinline{cost += a+b}};
+            \node [process, below=.6cm of cond1] (cond2) {\lstinline{a+b} 入堆};
+            \node [process, below=.6cm of cond2] (find) {返回\lstinline{cost}};
+            \node [startstop, below=.6cm of find] (end) {结束};
+
+            \draw [arr] (start) -- (input);
+            \draw [arr] (input) -- (hash);
+            \draw [arr] (hash) -- node[anchor=east] {否} (get);
+            \draw [arr] (get) -- (cond1);
+            \draw [arr] (cond1) -- (cond2);
+            \draw [arr] (cond2) -- ($(cond2.east) + (2, 0)$) node[anchor = west] {} |- ($(hash.north) + (0, 0.3)$);
+            \draw [arr] (find) -- (end);
+            \draw [arr] (hash) -- ($(hash.west) + (-0.5, 0)$) node[anchor = east] {是} |- (find);
+
+        \end{tikzpicture}
+        \caption{查找HashTable中的值}
+        \label{logic}
+    \end{figure}
+}
 

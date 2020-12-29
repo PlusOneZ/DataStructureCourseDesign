@@ -3,11 +3,11 @@
 在输入时，不合法的字符会引起一些异常来指示当前程序的状态。通过处理这些异常可以改变程序的执行序列，在出错之前%
 将程序的执行权交给处理错的代码。本例的数据结构和系统都有异常类来提供必要的信息。其中一个例子是：
 \begin{lstlisting}[firstnumber=244, caption=HashTableException 异常类]
-class HashTableException : public std::exception {
+class MinHeapException : public std::exception {
 public:
-    explicit HashTableException(const char* s) : content(s) { }
+    explicit MinHeapException(const char* s) : content(s) { }
     const char *what() const _NOEXCEPT override {
-        return content;
+            return content;
     };
 
     const char* content;
@@ -41,197 +41,89 @@ public:
 
 \chapter{数据测试}
 
-\section{正常情况}
-\begin{enumerate}
-    \item 创建系统数据表
+\section{使用自带测试用例}
+
 \begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4             -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE              -$
-    #2: 2345 Bob male 20 CS                   -$
-    #3: 3456 zzy m 20 DataStructure           -$
-    #4: 4567 miao pet 5 EatAndSleep           -$
-    Unidentified sex pet modified to 'unknown'
+    Case 1: 1 9
+    Cost is: 9
     
-    Total 4 students added
-    No ID       Name        Sex     Age     Type of Examination
-    1. 1234     alice       female  20      SSE
-    2. 2345     Bob         male    20      CS
-    3. 3456     zzy         male    20      DataStructure
-    4. 4567     miao        unknown 5       EatAndSleep
-\end{lstlisting}
-可以看出，不合法的性别会被识别成 unknown。
-
-    \item 目录
-\begin{lstlisting}[style=console]
-    |***** Menu of Commands *****|
-    |  1: Insert      2: Delete  |
-    |  3: Find        4: Edit    |
-    |  5: Statistics  0: Exit    |
-\end{lstlisting}
-
-    \item 添加成员
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 1       -$
-    Enter the position of candidate: 1      -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    0123 Oscar m 21 Social                  -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 1234     alice       female   20      SSE
-    3. 2345     Bob         male     20      CS
-    4. 3456     zzy         male     20      DataStructure
-    5. 4567     miao        unknown  5       EatAndSleep
-\end{lstlisting}
-
-    \item 删除（按位置）
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to remove: 4 -$
-    The candidate removed is: 
-    3456       zzy          male     20      DataStructure
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 1234    alice        female   20      SSE
-    3. 2345    Bob          male     20      CS
-    4. 4567    miao         unknown  5       EatAndSleep
+    Case 2: 10 7 3 5 13 9 11 45 97 57 31
+    Cost is: 751
+    
+    Case 3: 10 12 42 4 6 86 46 80 78 54 2
+    Cost is: 1172
+    
+    Case 4: 20 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+    Cost is: 864
+    
+    Case 5: 3 273646485859594887373722312323 27364648585959488737372231232 7
+    Cost is: 328375783031513864848466774801
+    
+    Case 6: 0 
+    
+    Case 7: 8 2 1 3 9 4 11 13 15
+    Cost is: 154
+    
+    Case 8: 8 4 5 1 2 1 3 1 1
+    Cost is: 49
+    
+    Case 9: 1 .
+    Invalid number detected.
+    
+    Case 10: 19 1
+    Unfinished input!
+    Cost is: 1
+    
+    The the last two tests should alert warnings.
+    Process finished with exit code 0    
 \end{lstlisting}
 
-    \item 插入（按考号）
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 1234    -$
-    The candidate removed is: 
-    1234       alice        female   20      SSE
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 2345    Bob          male     20      CS
-    3. 4567    miao         unknown  5       EatAndSleep
-\end{lstlisting}
+可以看到结果符合预期。
 
-    \item 用考号查找学生
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 3       -$
-    Enter candidate's ID to find: 2345      -$
-    2345     Bob         male    20       CS
-\end{lstlisting}
 
-    \item 修改学生信息（按位置）
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 3   -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    4567 miao m 16 EatAndWalk               -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
-\end{lstlisting}
-
-    \item 统计
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 5       -$
-    Male: 3   Female: 0    Unknown: 0
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
-\end{lstlisting}
-
-    \item 结束
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 0       -$
-    Bye~
-\end{lstlisting}
-\end{enumerate}
-
-\vspace*{3cm}
-
-\section{输入异常}
+\section{手动输入}
 
 \begin{enumerate}
-    \item 创建系统数据表时直接中断
+    \item 正常测试
 \begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4           -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE            -$
-    #2: 2345 Bob male 20 CS                 -$
-    #3:                                     -$ // 输入回车
+    Enter number(n) of logs to cut, then the length of each log.
+    Number 0 to quit: 3
+    1 2 3
+    Cost is: 9
+\end{lstlisting}
+
+    \item 大数测试
+\begin{lstlisting}[style=console]
+    Enter number(n) of logs to cut, then the length of each log.
+    Number 0 to quit: 4
+    12323213123123123123123131 11 1 1
+    Cost is: 12323213123123123123123159
+\end{lstlisting}
+
+    \item 多个大数测试
+\begin{lstlisting}[style=console]
+    Number 0 to quit: 10
+    1827346738892838747362521
+    8238784783743239843423421
+    7346590498874637384758940
+    8374736636374829388478040
+    8387475757757584493029302
+    8433847293842938472310490
+    8978473248767837428374832
+    2389834792384772364726473
+    9987239847237647236482384
+    4347837283492384234234244
+    Cost is: 217718700990153735237954173
+\end{lstlisting}
+
+\item 不合法字符
+\begin{lstlisting} [style=console]
+    Enter number(n) of logs to cut, then the length of each log.
+    Number 0 to quit: 
+    2
+    ** **
+    Invalid number detected.
+\end{lstlisting}
+    会给提示并退出。
     
-    Total 2 students added
-    No ID       Name        Sex       Age       Type of Examination
-    1. 1234     alice       female    20        SSE
-    2. 2345     Bob         male      20        CS
-\end{lstlisting}
-    用回车可以中断输入。
-
-    \item 插入输入不存在的位置
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 1       -$
-    Enter the position of candidate: 6      -$
-    Position should be between 1 to 5       -$
-    Try again: // ...
-\end{lstlisting}
-    位置不存在会提醒重新输入。
-
-    \item 删除：位置不存在
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    6                                       -$
-    Try again, enter 1 / 2: 
-    1                                       -$
-    Enter candidate's position to remove: 6 -$
-    Invalid Index
-    Position 6 not found!
-
-    Enter your command, 6 for menu:  // ...
-\end{lstlisting}
-    功能选择错误会提醒重新输入，位置不存在会有提示并退出。
-
-\item 删除：考号不存在
-\begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 0000    -$
-    Candidate with ID 0000 not found!
-
-    Enter your command, 6 for menu: // ...
-\end{lstlisting}
-    会给提示并退出。
-
-    \item 查找：找不到考号
-\begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 3
-    Enter candidate's ID to find: 
-    0000
-    Candidate with ID 0000 not found
-\end{lstlisting}
-    会给提示并退出。
-
-    \item 修改学生信息：位置或考号不存在
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 6   -$
-    Invalid Index
-    Position 6 not found!
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to edit: 0000      -$
-    Candidate with ID 0000 not found!
-\end{lstlisting}
-    与删除类似。
-
 \end{enumerate}

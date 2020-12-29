@@ -878,6 +878,8 @@ void Graph<VTag>::addEdge(const VTag &u, const VTag &v, int weight) {
 
 template<class VTag>
 void Graph<VTag>::addEdge(size_t u, size_t v, int weight) {
+    if (u == v) // self looping not allowed
+        return;
     try {
         for (int i = 0; i < vertexes[u]->adjacents.length(); ++i) {
             if (vertexes[u]->adjacents[i]->index == v)
@@ -993,7 +995,7 @@ Graph<V> minSpanningTree(Graph<V> &graph, const V& start) {
         size_t nextIndex = v->index;
         int nextWeight = graph.vertexes[startIndex]->weights[i];
         edgeHeap.push(Edge(startIndex, nextIndex, nextWeight));
-        rec[nextIndex].prevVer = 0;
+        rec[nextIndex].prevVer = startIndex;
         rec[nextIndex].weight = nextWeight;
     }
 
@@ -1008,13 +1010,16 @@ Graph<V> minSpanningTree(Graph<V> &graph, const V& start) {
                 curTag, rec[curIndex].weight);
         rec[curIndex].jointed = true;
 
+        std::cout << graph.vertexes[rec[curIndex].prevVer]->tag << " -> "
+                    << curTag << std::endl;
+
         const size_t adjs = graph.vertexes[curIndex]->adjacents.length();
         for (int i = 0; i < adjs; ++i) {
             size_t nextIndex = graph.vertexes[curIndex]->adjacents[i]->index;
             int nextWeight = graph.vertexes[curIndex]->weights[i];
             if (rec[nextIndex].jointed) continue;
             if (rec[nextIndex].weight > nextIndex) {
-                rec[nextIndex].prevVer = result.vertexes.length() - 1;
+                rec[nextIndex].prevVer = curIndex;
                 rec[nextIndex].weight = nextWeight;
                 edgeHeap.push(Edge(curIndex, nextIndex, nextWeight));
             }
@@ -1123,6 +1128,7 @@ void PowerSystem::createVertex() {
         }
         while (graph.hasTag(name)) {
             cout << "Name " << name << " already exist, try again: \n";
+            cout << "#" << i+1 << ": ";
             std::getline(cin, name);
         }
         graph.addVertex(name);
@@ -1154,6 +1160,10 @@ void PowerSystem::createEdge() {
         ss >> to;
         if (!graph.hasTag(to)) {
             cout << "Tag " << to << " not in the graph." << std::endl;
+            continue;
+        }
+        if (from == to) {
+            cout << "Cannot create self link!" << std::endl;
             continue;
         }
         int weight;

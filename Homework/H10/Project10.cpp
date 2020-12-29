@@ -520,7 +520,7 @@ void SortingSystem<Type, RandomMachine>::run() {
 }
 
 int main() {
-    SortingSystem<long> system;
+    SortingSystem<unsigned long> system;
     system.run();
     return 0;
 }

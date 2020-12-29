@@ -20,8 +20,8 @@ add_executable(DataStructure
 #        Homework/H5/Project5.cpp
 #        Homework/H6/Project6.cpp
 #        Homework/H7/Project7.cpp
-#        Homework/H8/Project8.cpp
-        Homework/H9/Project9.cpp
+        Homework/H8/Project8.cpp
+#        Homework/H9/Project9.cpp
 #        Homework/H10/Project10.cpp
 
 #        MyDS/Vector.cpp

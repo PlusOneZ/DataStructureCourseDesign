@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #ifndef _NOEXCEPT
 #define _NOEXCEPT noexcept
@@ -137,7 +138,7 @@ void Vector<ElemType>::reallocate(size_t new_size) {
 template<class ElemType>
 void Vector<ElemType>::extend() {
     if (capacity == 0) {
-        capacity = 2;
+        capacity = LowerBound;
         data = new ElemType[capacity];
     } else {
         reallocate(2 * capacity);
@@ -374,6 +375,7 @@ void MinHeap<ElemType, Compare>::clear() {
 }
 
 
+///--------------------------- BigInteger -----------------------------------///
 
 class NaNException : public std::exception {
 public:
@@ -382,16 +384,12 @@ public:
     }
 };
 
-
-///--------------------------- BigInteger -----------------------------------///
-
 class BigInteger {
     friend std::ostream &operator <<(std::ostream &, const BigInteger &);
 public:
     explicit BigInteger(const string& i = "") :
             integer(check(i)) { }
     BigInteger &operator=(string s);
-    ~BigInteger() = default;
 
     bool operator>(const BigInteger &other) const;
     bool operator<(const BigInteger &other) const;
@@ -614,7 +612,6 @@ private:
     static constexpr int caseNum = 10;
     string tests[caseNum] = {
             "1 9",
-            "1 .",
             "10 7 3 5 13 9 11 45 97 57 31",
             "10 12 42 4 6 86 46 80 78 54 2",
             "20 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
@@ -622,6 +619,7 @@ private:
             "0 ",
             "8 2 1 3 9 4 11 13 15",
             "8 4 5 1 2 1 3 1 1",
+            "1 .",
             "19 1"
     };
 };
@@ -638,7 +636,7 @@ void TestCases::run() {
         }
         std::cout << std::endl;
     }
-    std::cout << "The second and the last test should alert a warning."
+    std::cout << "The the last two tests should alert warnings."
               << std::endl;
 }
 
@@ -646,7 +644,7 @@ void TestCases::run() {
 
 ///------------------------- main function ----------------------------------///
 
-#define TEST_CASES
+//#define TEST_CASES
 
 int main() {
 
@@ -663,7 +661,7 @@ int main() {
     cout << "Enter number(n) of logs to cut, then the length of each log.\n"
             "Number 0 to quit: ";
     cin >> n;
-    while (n != 0) {
+    while (n != 0 && !cin.eof()) {
         factory.readAndRun(cin, n);
         cout << "Enter number(n) of logs to cut, then the length of each log.\n"
                 "Number 0 to quit: ";

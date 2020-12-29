@@ -1,0 +1,44 @@
+    template <class Type>
+    class LinkedList {
+    public:
+
+        struct LinkNode {           // 嵌套节点类
+            LinkNode *prev = nullptr;
+            LinkNode *next = nullptr;
+            Type data;
+    
+            LinkNode() = default;
+            explicit LinkNode(const Type &);
+        };
+    
+        typedef LinkNode* Link;     // 别名
+    
+        LinkedList();               // 构造器
+        LinkedList(LinkedList const &);
+        ~LinkedList();
+    
+        int length() const;         // 大小
+        bool isEmpty() const;       // 是否为空
+        Link getHead() const;       
+        Link getTail() const;
+        int search(const Type& x) const;
+        int searchByMethod(std::function<bool(Type & )> method);
+        Link locate(int i) const;
+        Link insert(int i, const Type& d);
+        Link insert(int i, Link link);
+        bool remove(int i, Type& d);
+        bool remove(int i, Link link = nullptr);
+        bool removeTarget(Link link, Type& d);
+        Link insertBack(const Type& d);
+    
+        void forEach(std::function<void(Type&)>);
+    
+    
+    protected:
+        Link head;
+        Link tail;
+        int elemNum = 0;
+    
+        bool makeNode(Link &) const;
+        bool makeNode(Link &, const Type& x) const;
+        Link insertTarget(Link tar, Link link);
