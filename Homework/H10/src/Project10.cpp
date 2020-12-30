@@ -1,8 +1,9 @@
-
-#include "../../MyDS/Vector.h"
+#include <iostream>
 #include <random>
 #include <limits>
 #include <ctime>
+
+//#define BOUND (100)
 
 template <class Type, class RandomMachine = std::uniform_int_distribution<Type>>
 class SortingSystem {
@@ -15,14 +16,17 @@ class SortingSystem {
         ++compareCount[s];
         return t1 > t2;
     };
+
     static bool less(Type t1, Type t2, Sortings s) {
         ++compareCount[s];
         return t1 < t2;
     };
+
     static bool equal(Type t1, Type t2, Sortings s) {
         ++compareCount[s];
         return t1 == t2;
     }
+
     static void swap(Type &t1, Type &t2, Sortings s) {
         Type t = t1;
         t1 = t2;
@@ -30,6 +34,7 @@ class SortingSystem {
         ++swapCount[s];
         assignCount[s] += 3;
     }
+
     template<typename T>
     inline static const T& min(const T &a, const T &b, Sortings s = NoSort) {
         ++compareCount[s];
@@ -47,6 +52,7 @@ public:
     static void heapSort(Type arr[], size_t n);
     static void mergeSort(Type arr[], size_t n);
     static void radixSort(Type arr[], size_t n);
+
     void resize(int n);
     clock_t testAndClock(Sortings s);
     bool parseCommand(const std::string &cmd);
@@ -58,6 +64,9 @@ private:
     // system
     void genRandom(size_t n);
     static void showMenu();
+    static inline void copy(Type *dest, Type *source, size_t size);
+    static inline void clearCounters(Sortings s);
+    static inline bool checkResult(Type *arr, size_t n);
 
     // quick sort
     inline static void quickSort(Type arr[], Type *l, Type *r);
@@ -68,10 +77,6 @@ private:
     // radix sort
     inline static Type maxDigits(Type *arr, size_t n, const Type &radix);
     inline static void radixSort(Type arr[], size_t n, const Type& radix);
-
-    static inline void showVec(Type arr[], size_t n);
-    static inline void copy(Type *dest, Type *source, size_t size);
-    static inline void clearCounters(Sortings s);
 
 private:
     Type *array = nullptr;
@@ -90,7 +95,6 @@ unsigned long long SortingSystem<T, R>::assignCount[9];
 
 template <class Type, class RandomMachine>
 void SortingSystem<Type, RandomMachine>::bubbleSort(Type *arr, size_t n) {
-    Type temp;
     for (int i = 0; i < n - 1; ++i) {
         for (int j = 0; j < n - i - 1; ++j) {
             if (greater(arr[j], arr[j+1], Bubble)) {
@@ -106,7 +110,10 @@ void SortingSystem<Type, RandomMachine>::selectionSort(Type *arr, size_t n) {
         int minIndex = i;
         for (int j = i; j < n; ++j) {
             if (greater(arr[minIndex], arr[j], Selection))
-                swap(arr[minIndex], arr[j], Selection);
+                minIndex = j;
+        }
+        if (minIndex != i) {
+            swap(arr[minIndex], arr[i], Selection);
         }
     }
 }
@@ -127,17 +134,16 @@ void SortingSystem<Type, RandomMachine>::insertSort(Type *arr, size_t n) {
 
 template <class Type, class RandomMachine>
 void SortingSystem<Type, RandomMachine>::shellSort(Type *arr, size_t n) {
-    int j;
-    for (size_t gap = n / 2; gap > 0; gap /= 2) {
-        for (size_t i = gap; i < n; i++) {
-            Type temp = arr[i];
-            for (j = i; j >= gap && less(temp, arr[j - gap], Shell); j -= gap) {
-                arr[j] = arr[j - gap];
-                ++assignCount[Shell];
+    size_t gap = 1;
+    while (gap < n/3) gap = 3*gap + 1;
+    while (gap >= 1) {
+        for (int i = gap; i < n; i++) {
+            for (int j = i; j >= gap && less(arr[j], arr[j - gap], Shell);
+                 j -= gap) {
+                swap(arr[j], arr[j - gap], Shell);
             }
-            arr[j] = temp;
-            ++assignCount[Shell];
         }
+        gap = gap / 3;
     }
 }
 
@@ -183,9 +189,9 @@ SortingSystem<Type, RandomMachine>::medium(const Type &a, const Type &b, const T
 
 template <class Type, class RandomMachine>
 void SortingSystem<Type, RandomMachine>::heapSort(Type *arr, size_t n) {
-    for (int i = n/2 - 1; i >= 0; i--)
+    for (long long i = n/2 - 1; i >= 0; i--)
         maxHeapify(arr, i, n - 1);
-    for (int i = n-1; i > 0; i--) {
+    for (long long i = n-1; i > 0; i--) {
         swap(arr[0], arr[i], Heap);
         maxHeapify(arr, 0, i - 1);
     }
@@ -216,7 +222,8 @@ void SortingSystem<Type, RandomMachine>::mergeSort(Type *arr, size_t n) {
     for (size_t step = 1; step < n; step += step) {
         for (size_t start = 0; start < n; start += 2 * step) {
             size_t low = start;
-            size_t mid = min(start + step, n), high = min(start + 2 * step, n);
+            size_t mid = min(start + step, n),
+                high = min(start + 2 * step, n);
             size_t k = low;
             size_t leftStart = low, leftEnd = mid;
             size_t rightStart = mid, rightEnd = high;
@@ -288,47 +295,47 @@ void SortingSystem<Type, RandomMachine>::radixSort(Type *arr, size_t n, const Ty
         std::cerr << "Invalid radix" << std::endl;
         return;
     }
+    Type *s = arr;
     Type d = maxDigits(arr, n, radix);
     Type *tmp = new Type[n];
     Type *count = new Type[radix];
     long long i, j, k;
-    Type curRadix = static_cast<Type>(1); ++assignCount[Radix];
+    Type curRadix = (Type)(1); ++assignCount[Radix];
     for(i = 1; i <= d; i++) {
         for (j = 0; j < radix; j++) {
-            count[j] = static_cast<Type>(0);
+            count[j] = (Type)(0);
             ++assignCount[Radix];
         }
+        // count
         for (j = 0; j < n; j++) {
             k = (arr[j] / curRadix) % radix;
             ++count[k];
         }
+        // make room
         for (j = 1; j < radix; j++) {
             count[j] = count[j - 1] + count[j];
         }
+        // move
         for (j = n - 1; j >= 0; j--) {
             k = (arr[j] / curRadix) % radix;
             tmp[count[k] - 1] = arr[j];
             ++assignCount[Radix];
             --count[k];
         }
-        for (j = 0; j < n; j++) {
-            arr[j] = tmp[j];
+        auto p = tmp;
+        tmp = arr;
+        arr = p;
+        curRadix = curRadix * radix;
+    }
+    if (arr != s) {
+        for (int l = 0; l < n; ++l) {
+            tmp[l] = arr[l];
             ++assignCount[Radix];
         }
-        curRadix = curRadix * radix;
+        tmp = arr;
     }
     delete []tmp;
     delete []count;
-}
-
-template <class Type, class RandomMachine>
-void SortingSystem<Type, RandomMachine>::showVec(Type *arr, size_t n) {
-    using std::cout;
-    int cnt = 0;
-    for (int i = 0; i < n; ++i) {
-        cout << arr[i] << "\t";
-        if (++cnt == 5) { cout << std::endl; cnt = 0; }
-    }
 }
 
 template <class Type, class RandomMachine>
@@ -346,7 +353,11 @@ void SortingSystem<Type, RandomMachine>::genRandom(size_t n) {
     RandomMachine machine(std::numeric_limits<Type>::min(), std::numeric_limits<Type>::max());
     std::default_random_engine e(std::clock());
     for (size_t i = 0; i < n; ++i) {
+#ifdef BOUND
+        array[i] = machine(e) % BOUND;
+#else
         array[i] = machine(e);
+#endif
     }
 }
 
@@ -393,6 +404,9 @@ SortingSystem<Type, RandomMachine>::testAndClock(SortingSystem::Sortings s) {
             return 0;
     }
     auto end = std::clock();
+    if (!checkResult(cpy, curSize)) {
+        std::cerr << "Answer wrong" << std::endl;
+    }
     return end - start;
 }
 
@@ -455,7 +469,10 @@ void SortingSystem<Type, RandomMachine>::redesignateSize() {
         cin.ignore(std::numeric_limits<int>::max(), '\n');
         cin >> s;
     }
+    std::string temp;
+    std::getline(cin, temp);
     resize(s);
+    cout << "resizing..." << std::endl;
 }
 
 template<class Type, class RandomMachine>
@@ -508,9 +525,7 @@ void SortingSystem<Type, RandomMachine>::run() {
     showMenu();
     cout << "Firstly, ";
     redesignateSize();
-    cout << "Enter Your first command: ";
-    std::string cmd;
-    std::getline(cin, cmd);
+    std::string cmd = "";
     while (parseCommand(cmd)) {
         cout << "Enter your next command: ";
         std::getline(cin, cmd);
@@ -519,8 +534,18 @@ void SortingSystem<Type, RandomMachine>::run() {
     cout << "\nBye~" << std::endl;
 }
 
+template<class Type, class RandomMachine>
+bool SortingSystem<Type, RandomMachine>::checkResult(Type *arr, size_t n) {
+    for (int i = 0; i < n - 1; ++i) {
+        if (less(arr[i + 1], arr[i], NoSort)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int main() {
-    SortingSystem<unsigned long> system;
+    SortingSystem<unsigned long long> system;
     system.run();
     return 0;
 }

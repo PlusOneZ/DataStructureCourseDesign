@@ -1,0 +1,128 @@
+Semester 1: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |ProgrammDesign  |English         |ProgrammDesign  |                |
+|English         |ProgrammDesign  |English         |ProgrammDesign  |                |
+|English         |ProgrammDesign  |DSandAlgo       |DiscreteMath    |                |
+|DSandAlgo       |                |DSandAlgo       |DiscreteMath    |                |
+|DSandAlgo       |                |DSandAlgo       |DiscreteMath    |                |
+|Chinese         |DiscreteMath    |                |                |                |
+|Chinese         |DiscreteMath    |                |                |                |
+|Chinese         |DiscreteMath    |                |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+
+Semester 2: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |AlgoDesign      |English         |AlgoDesign      |                |
+|English         |AlgoDesign      |English         |AlgoDesign      |                |
+|English         |AlgoDesign      |ASM             |ComputerComponen|                |
+|MicroComputer   |                |ASM             |ComputerComponen|                |
+|MicroComputer   |                |                |ComputerComponen|                |
+|ASM             |ComputerComponen|MicroComputer   |                |                |
+|ASM             |ComputerComponen|MicroComputer   |                |                |
+|ASM             |ComputerComponen|MicroComputer   |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+
+Semester 3: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |Complie         |English         |Complie         |                |
+|English         |Complie         |English         |Complie         |                |
+|English         |Complie         |DataBase        |OS              |                |
+|DataBase        |                |DataBase        |OS              |                |
+|DataBase        |                |DataBase        |                |                |
+|SCMicro         |OS              |                |                |                |
+|SCMicro         |OS              |                |                |                |
+|SCMicro         |OS              |                |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+
+Semester 4: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |                |English         |                |                |
+|English         |                |English         |                |                |
+|English         |                |Math            |                |                |
+|                |                |Math            |                |                |
+|                |                |Math            |                |                |
+|Math            |                |                |                |                |
+|Math            |                |                |                |                |
+|Math            |                |                |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+
+Semester 5: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |Statistics      |English         |Statistics      |                |
+|English         |Statistics      |English         |Statistics      |                |
+|English         |Statistics      |LinearAlgebra   |Statistics      |                |
+|                |                |LinearAlgebra   |Physics         |                |
+|                |                |LinearAlgebra   |Physics         |                |
+|LinearAlgebra   |Physics         |ComputerCulture |                |                |
+|LinearAlgebra   |Physics         |ComputerCulture |                |                |
+|LinearAlgebra   |Physics         |ComputerCulture |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+
+Semester 6: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |CSNet           |English         |CSNet           |                |
+|English         |CSNet           |English         |CSNet           |                |
+|English         |CSNet           |SystemStructure |Communication   |                |
+|                |                |SystemStructure |Communication   |                |
+|                |                |SystemStructure |Communication   |                |
+|SystemStructure |Communication   |OOP             |                |                |
+|SystemStructure |Communication   |OOP             |                |                |
+|SystemStructure |Communication   |OOP             |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+
+Semester 7: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |C#.net          |English         |C#.net          |                |
+|English         |C#.net          |English         |C#.net          |                |
+|English         |C#.net          |VC++            |PowerBuilder    |                |
+|ASP             |                |VC++            |PowerBuilder    |                |
+|ASP             |                |VC++            |                |                |
+|Java            |PowerBuilder    |ASP             |                |                |
+|Java            |PowerBuilder    |ASP             |                |                |
+|Java            |PowerBuilder    |ASP             |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+
+Semester 8: 
+-------------------------------------------------------------------------------------
+| Mon            | Tue            | Wed            | Thur           | Fri            |
+|English         |VB.net          |English         |VB.net          |                |
+|English         |VB.net          |English         |VB.net          |                |
+|English         |VB.net          |JSP             |Delphi          |                |
+|C++Builder      |                |JSP             |Delphi          |                |
+|C++Builder      |                |                |                |                |
+|JSP             |Delphi          |C++Builder      |                |                |
+|JSP             |Delphi          |C++Builder      |                |                |
+|JSP             |Delphi          |C++Builder      |                |                |
+|                |                |                |                |                |
+|                |                |                |                |                |
+-------------------------------------------------------------------------------------
+
+

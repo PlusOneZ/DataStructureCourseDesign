@@ -101,6 +101,7 @@ Vector<ElemType> &Vector<ElemType>::operator=(Vector<ElemType> const &another) {
 
 template<class ElemType>
 Vector<ElemType>::Vector(const Vector<ElemType> &vec) {
+    data = new ElemType[LowerBound];
     *this = vec;
 }
 

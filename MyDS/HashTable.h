@@ -42,6 +42,10 @@ template<> struct Hash<std::string> {
     size_t operator()(const std::string &s) const { return hashString(s.c_str()); }
 };
 
+template<> struct Hash<int> {
+    size_t operator()(int i) const { return i; }
+};
+
 template <class ValueType>
 struct HashNode {
     explicit HashNode(const ValueType &v) : next(nullptr), value(v) { }
@@ -57,6 +61,7 @@ public:
 
     inline size_t maxBucketNum() const;
     inline size_t bucketCount() const;
+    inline size_t numElements( ) const;
     bool insertUnique(const ValueType& obj);
     void clear();
     ValueType & find(const Key&);
@@ -300,6 +305,12 @@ HashTable<ValueType, Key, HashFunction, ExtractKey, EqualKey>::
         }
     }
     return count;
+}
+
+template<class ValueType, class Key, class HashFunction, class ExtractKey, class EqualKey>
+size_t
+HashTable<ValueType, Key, HashFunction, ExtractKey, EqualKey>::numElements() const {
+    return num_elements;
 }
 
 

@@ -1,23 +1,4 @@
 
-\chapter{异常}
-在输入时，不合法的字符会引起一些异常来指示当前程序的状态。通过处理这些异常可以改变程序的执行序列，在出错之前%
-将程序的执行权交给处理错的代码。本例的数据结构和系统都有异常类来提供必要的信息。其中一个例子是：
-\begin{lstlisting}[firstnumber=244, caption=HashTableException 异常类]
-class HashTableException : public std::exception {
-public:
-    explicit HashTableException(const char* s) : content(s) { }
-    const char *what() const _NOEXCEPT override {
-        return content;
-    };
-
-    const char* content;
-};
-\end{lstlisting}
-
-异常在合适的代码位置被抛出，但应该被处理，否则用户就会因为未处理的异常在使用程序时遇到软件终止的情况。%
-异常的设计是：该代码段不应该处理该问题或是处理问题时会带来额外的副作用，就应该在此处抛出异常。本项目的%
-异常基本都得到了处理。
-
 
 \lstdefinestyle{console} {
     language=HTML,
@@ -39,199 +20,510 @@ public:
     identifierstyle={},
 }
 
-\chapter{数据测试}
+\chapter{功能测试}
 
-\section{正常情况}
 \begin{enumerate}
-    \item 创建系统数据表
-\begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4             -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE              -$
-    #2: 2345 Bob male 20 CS                   -$
-    #3: 3456 zzy m 20 DataStructure           -$
-    #4: 4567 miao pet 5 EatAndSleep           -$
-    Unidentified sex pet modified to 'unknown'
-    
-    Total 4 students added
-    No ID       Name        Sex     Age     Type of Examination
-    1. 1234     alice       female  20      SSE
-    2. 2345     Bob         male    20      CS
-    3. 3456     zzy         male    20      DataStructure
-    4. 4567     miao        unknown 5       EatAndSleep
-\end{lstlisting}
-可以看出，不合法的性别会被识别成 unknown。
-
     \item 目录
-\begin{lstlisting}[style=console]
-    |***** Menu of Commands *****|
-    |  1: Insert      2: Delete  |
-    |  3: Find        4: Edit    |
-    |  5: Statistics  0: Exit    |
+\begin{lstlisting} [style=console]
+    Welcome to Sorting Comparison System, this is menu:
+    ***********************************************
+    **        Sorting Algorithm Comparison       **
+    **-------------------------------------------**
+    **     0. Re-designate size of random data   **
+    **     1.          Bubble Sort               **
+    **     2.       Selection Sort               **
+    **     3.       Insertion Sort (Straight)    **
+    **     4.           Shell Sort               **
+    **     5.           Quick Sort               **
+    **     6.            Heap Sort               **
+    **     7.           Merge Sort               **
+    **     8.           Radix Sort               **
+    **     9.              EXIT                  **
+    ***********************************************
 \end{lstlisting}
-
-    \item 添加成员
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 1       -$
-    Enter the position of candidate: 1      -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    0123 Oscar m 21 Social                  -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 1234     alice       female   20      SSE
-    3. 2345     Bob         male     20      CS
-    4. 3456     zzy         male     20      DataStructure
-    5. 4567     miao        unknown  5       EatAndSleep
+    \item 分配初始大小
+\begin{lstlisting} [style=console]
+    Firstly, Enter new size of random data: 1000
+    resizing...
+    Enter your next command: 0
 \end{lstlisting}
-
-    \item 删除（按位置）
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to remove: 4 -$
-    The candidate removed is: 
-    3456       zzy          male     20      DataStructure
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 1234    alice        female   20      SSE
-    3. 2345    Bob          male     20      CS
-    4. 4567    miao         unknown  5       EatAndSleep
-\end{lstlisting}
-
-    \item 插入（按考号）
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 1234    -$
-    The candidate removed is: 
-    1234       alice        female   20      SSE
-    No ID      Name         Sex      Age     Type of Examination
-    1. 0123    Oscar        male     21      Social
-    2. 2345    Bob          male     20      CS
-    3. 4567    miao         unknown  5       EatAndSleep
-\end{lstlisting}
-
-    \item 用考号查找学生
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 3       -$
-    Enter candidate's ID to find: 2345      -$
-    2345     Bob         male    20       CS
-\end{lstlisting}
-
-    \item 修改学生信息（按位置）
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 3   -$
-    Enter candidate's ID, name, sex, age and type of examination: 
-    4567 miao m 16 EatAndWalk               -$
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
-\end{lstlisting}
-
-    \item 统计
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 5       -$
-    Male: 3   Female: 0    Unknown: 0
-    No ID       Name        Sex      Age     Type of Examination
-    1. 0123     Oscar       male     21      Social
-    2. 2345     Bob         male     20      CS
-    3. 4567     miao        male     16      EatAndWalk
-\end{lstlisting}
-
-    \item 结束
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 0       -$
-    Bye~
+    \item 改变大小
+\begin{lstlisting} [style=console]
+    Enter new size of random data: 10000
+    resizing...
+    Enter your next command:  
 \end{lstlisting}
 \end{enumerate}
 
-\vspace*{3cm}
 
-\section{输入异常}
+\chapter{数据测试}
+
+\section{100个数据}
+\begin{lstlisting} [style=console]
+    Firstly, Enter new size of random data: 100
+    resizing...
+    Enter your next command: 1
+    
+    Bubble Sort:
+    Time consumption:		51 clocks  =  5.1e-05 sec.
+    Comparison times:		4950
+    Swapping times:  		2534
+    Assignment times:		7602
+    
+    Enter your next command: 2
+    
+    Selection Sort:
+    Time consumption:		24 clocks  =  2.4e-05 sec.
+    Comparison times:		5050
+    Swapping times:  		96
+    Assignment times:		288
+    
+    Enter your next command: 3
+    
+    Straight Insertion Sort:
+    Time consumption:		35 clocks  =  3.5e-05 sec.
+    Comparison times:		2628
+    Swapping times:  		0
+    Assignment times:		2634    
+    
+    Enter your next command: 4
+    
+    Shell Sort:
+    Time consumption:		17 clocks  =  1.7e-05 sec.
+    Comparison times:		731
+    Swapping times:  		428
+    Assignment times:		1284
+    
+    Enter your next command: 5
+    
+    Quick Sort:
+    Time consumption:		20 clocks  =  2e-05 sec.
+    Comparison times:		1173
+    Swapping times:  		170
+    Assignment times:		609
+    
+    Enter your next command: 6
+    
+    Heap Sort:
+    Time consumption:		20 clocks  =  2e-05 sec.
+    Comparison times:		1016
+    Swapping times:  		584
+    Assignment times:		1752
+    
+    Enter your next command: 7
+    
+    Merge Sort:
+    Time consumption:		16 clocks  =  1.6e-05 sec.
+    Comparison times:		563
+    Swapping times:  		0
+    Assignment times:		800
+    
+    Enter your next command: 8
+    
+    Radix Sort:
+    Time consumption:		92 clocks  =  9.2e-05 sec.
+    Comparison times:		99
+    Swapping times:  		0
+    Assignment times:		2204
+\end{lstlisting}
+
+\section{1,000个数据}
+\begin{lstlisting} [style=console]
+    Enter your next command: 0
+
+    Enter new size of random data: 1000
+    resizing...
+    Enter your next command: 1
+    
+    Bubble Sort:
+    Time consumption:		5629 clocks  =  0.005629 sec.
+    Comparison times:		499500
+    Swapping times:  		250188
+    Assignment times:		750564
+    
+    Enter your next command: 2
+    
+    Selection Sort:
+    Time consumption:		3031 clocks  =  0.003031 sec.
+    Comparison times:		500500
+    Swapping times:  		996
+    Assignment times:		2988
+    
+    Enter your next command: 3
+    
+    Straight Insertion Sort:
+    Time consumption:		1869 clocks  =  0.001869 sec.
+    Comparison times:		251179
+    Swapping times:  		0
+    Assignment times:		251188
+    
+    Enter your next command: 4
+    
+    Shell Sort:
+    Time consumption:		250 clocks  =  0.00025 sec.
+    Comparison times:		13541
+    Swapping times:  		8543
+    Assignment times:		25629
+    
+    Enter your next command: 5
+    
+    Quick Sort:
+    Time consumption:		263 clocks  =  0.000263 sec.
+    Comparison times:		15694
+    Swapping times:  		2369
+    Assignment times:		8106
+    
+    Enter your next command: 6
+    
+    Heap Sort:
+    Time consumption:		313 clocks  =  0.000313 sec.
+    Comparison times:		16867
+    Swapping times:  		9081
+    Assignment times:		27243
+    
+    Enter your next command: 7
+    
+    Merge Sort:
+    Time consumption:		205 clocks  =  0.000205 sec.
+    Comparison times:		8715
+    Swapping times:  		0
+    Assignment times:		10000
+    
+    Enter your next command: 8
+    
+    Radix Sort:
+    Time consumption:		898 clocks  =  0.000898 sec.
+    Comparison times:		999
+    Swapping times:  		0
+    Assignment times:		20209
+\end{lstlisting}
+
+\section{10,000个数据}
+\begin{lstlisting} [style=console]
+    Enter new size of random data: 10000
+    resizing...
+    Enter your next command: 1
+
+    Bubble Sort:
+    Time consumption:		387649 clocks  =  0.387649 sec.
+    Comparison times:		49995000
+    Swapping times:  		25194045
+    Assignment times:		75582135
+    
+    Enter your next command: 2
+    
+    Selection Sort:
+    Time consumption:		160211 clocks  =  0.160211 sec.
+    Comparison times:		50005000
+    Swapping times:  		9993
+    Assignment times:		29979
+    
+    Enter your next command: 3
+    
+    Straight Insertion Sort:
+    Time consumption:		116367 clocks  =  0.116367 sec.
+    Comparison times:		25204040
+    Swapping times:  		0
+    Assignment times:		25204045
+    
+    Enter your next command: 4
+    
+    Shell Sort:
+    Time consumption:		4068 clocks  =  0.004068 sec.
+    Comparison times:		234776
+    Swapping times:  		163849
+    Assignment times:		491547
+    
+    Enter your next command: 5
+    
+    Quick Sort:
+    Time consumption:		2492 clocks  =  0.002492 sec.
+    Comparison times:		198929
+    Swapping times:  		31697
+    Assignment times:		105090
+    
+    Enter your next command: 6
+    
+    Heap Sort:
+    Time consumption:		3263 clocks  =  0.003263 sec.
+    Comparison times:		235383
+    Swapping times:  		124201
+    Assignment times:		372603
+    
+    Enter your next command: 7
+    
+    Merge Sort:
+    Time consumption:		2125 clocks  =  0.002125 sec.
+    Comparison times:		123595
+    Swapping times:  		0
+    Assignment times:		140000
+    
+    Enter your next command: 8
+    
+    Radix Sort:
+    Time consumption:		7780 clocks  =  0.00778 sec.
+    Comparison times:		9999
+    Swapping times:  		0
+    Assignment times:		200207
+\end{lstlisting}
+
+\section{100,000个数据}
+\begin{lstlisting} [style=console]
+    Enter new size of random data: 100000
+    resizing...
+    Enter your next command: 1
+    
+    Bubble Sort:
+    Time consumption:		39508332 clocks  =  39.5083 sec.
+    Comparison times:		4999950000
+    Swapping times:  		2503316467
+    Assignment times:		7509949401
+    
+    Enter your next command: 2
+    
+    Selection Sort:
+    Time consumption:		15534255 clocks  =  15.5343 sec.
+    Comparison times:		5000050000
+    Swapping times:  		99991
+    Assignment times:		299973
+    
+    Enter your next command: 3
+    
+    Straight Insertion Sort:
+    Time consumption:		9959014 clocks  =  9.95901 sec.
+    Comparison times:		2503416452
+    Swapping times:  		0
+    Assignment times:		2503416467
+    
+    Enter your next command: 4
+    
+    Shell Sort:
+    Time consumption:		49378 clocks  =  0.049378 sec.
+    Comparison times:		3897107
+    Swapping times:  		2971393
+    Assignment times:		8914179
+    
+    Enter your next command: 5
+    
+    Quick Sort:
+    Time consumption:		25473 clocks  =  0.025473 sec.
+    Comparison times:		2338166
+    Swapping times:  		399105
+    Assignment times:		1297314
+    
+    Enter your next command: 6
+    
+    Heap Sort:
+    Time consumption:		37101 clocks  =  0.037101 sec.
+    Comparison times:		3019811
+    Swapping times:  		1574873
+    Assignment times:		4724619
+    
+    Enter your next command: 7
+    
+    Merge Sort:
+    Time consumption:		22043 clocks  =  0.022043 sec.
+    Comparison times:		1566498
+    Swapping times:  		0
+    Assignment times:		1800000
+    
+    Enter your next command: 8
+    
+    Radix Sort:
+    Time consumption:		63434 clocks  =  0.063434 sec.
+    Comparison times:		99999
+    Swapping times:  		0
+    Assignment times:		2000218
+\end{lstlisting}
+
+\section{更多数据情况}
+
+数据更多时三个简单排序算法已经不能处理，之比较后五个排序算法的性能。
+
+\subsection{1,000,000个数据}
+\begin{lstlisting} [style=console]
+    Enter your next command: 0
+
+    Enter new size of random data: 1000000
+    resizing...
+    Enter your next command: 4
+    
+    Shell Sort:
+    Time consumption:		576926 clocks  =  0.576926 sec.
+    Comparison times:		63552993
+    Swapping times:  		52157600
+    Assignment times:		156472800
+    
+    Enter your next command: 5
+    
+    Quick Sort:
+    Time consumption:		209780 clocks  =  0.20978 sec.
+    Comparison times:		27781727
+    Swapping times:  		4762030
+    Assignment times:		15286089
+    
+    Enter your next command: 6
+    
+    Heap Sort:
+    Time consumption:		354118 clocks  =  0.354118 sec.
+    Comparison times:		36793959
+    Swapping times:  		19048686
+    Assignment times:		57146058
+    
+    Enter your next command: 7
+    
+    Merge Sort:
+    Time consumption:		195628 clocks  =  0.195628 sec.
+    Comparison times:		18716179
+    Swapping times:  		0
+    Assignment times:		20000000
+    
+    Enter your next command: 8
+    
+    Radix Sort:
+    Time consumption:		520496 clocks  =  0.520496 sec.
+    Comparison times:		999999
+    Swapping times:  		0
+    Assignment times:		20000214
+\end{lstlisting}
+
+\subsection{10,000,000个数据}
+\begin{lstlisting} [style=console]
+    Enter your next command: 0
+
+    Enter new size of random data: 10000000
+    resizing...
+    Enter your next command: 4
+    
+    Shell Sort:
+    Time consumption:		10606506 clocks  =  10.6065 sec.
+    Comparison times:		1207764070
+    Swapping times:  		1072667774
+    Assignment times:		3218003322
+    
+    Enter your next command: 5
+    
+    Quick Sort:
+    Time consumption:		2256907 clocks  =  2.25691 sec.
+    Comparison times:		320647293
+    Swapping times:  		55308350
+    Assignment times:		175925049
+    
+    Enter your next command: 6
+    
+    Heap Sort:
+    Time consumption:		5895720 clocks  =  5.89572 sec.
+    Comparison times:		434645408
+    Swapping times:  		223835516
+    Assignment times:		671506548
+    
+    Enter your next command: 7
+    
+    Merge Sort:
+    Time consumption:		2149314 clocks  =  2.14931 sec.
+    Comparison times:		224003479
+    Swapping times:  		0
+    Assignment times:		240000000
+    
+    Enter your next command: 8
+    
+    Radix Sort:
+    Time consumption:		5186277 clocks  =  5.18628 sec.
+    Comparison times:		9999999
+    Swapping times:  		0
+    Assignment times:		200000219
+\end{lstlisting}
+
+
+\subsection{100,000,000个数据}
+\begin{lstlisting} [style=console]
+    Enter your next command: 0
+
+    Enter new size of random data: 100000000
+    resizing...
+    Enter your next command: 4
+
+    Shell Sort:
+    Time consumption:		167097861 clocks  =  167.098 sec.
+    Comparison times:		18861887945
+    Swapping times:  		17302477954
+    Assignment times:		51907433862
+
+    Enter your next command: 5
+    
+    Quick Sort:
+    Time consumption:		25167683 clocks  =  25.1677 sec.
+    Comparison times:		3672664469
+    Swapping times:  		628736936
+    Assignment times:		1986210807
+    
+    Enter your next command: 6
+    
+    Heap Sort:
+    Time consumption:		93239070 clocks  =  93.2391 sec.
+    Comparison times:		5012866304
+    Swapping times:  		2571568440
+    Assignment times:		7714705320
+    
+    Enter your next command: 7
+    
+    Merge Sort:
+    Time consumption:		23956431 clocks  =  23.9564 sec.
+    Comparison times:		2540153531
+    Swapping times:  		0
+    Assignment times:		2800000000
+    
+    Enter your next command: 8
+    
+    Radix Sort:
+    Time consumption:		49885463 clocks  =  49.8855 sec.
+    Comparison times:		99999999
+    Swapping times:  		0
+    Assignment times:		2000000216
+\end{lstlisting}
+
+\chapter{探究}
+
+\section{各种排序算法比较}
 
 \begin{enumerate}
-    \item 创建系统数据表时直接中断
-\begin{lstlisting} [style=console]
-    Constructing Registering System!
-    Enter amount of candidates: 4           -$
-    Enter candidate's ID, name, sex, age and type of examination one by one: 
-    #1: 1234 alice female 20 SSE            -$
-    #2: 2345 Bob male 20 CS                 -$
-    #3:                                     -$ // 输入回车
-    
-    Total 2 students added
-    No ID       Name        Sex       Age       Type of Examination
-    1. 1234     alice       female    20        SSE
-    2. 2345     Bob         male      20        CS
+    \item 在数据规模较小时，所有排序都有不错的表现。
+    \item 冒泡、插入、选择排序三个排序是简单排序算法，在大规模数据上性能不佳，原因是其时间复杂度太高。
+    \item 当数据规模较大时希尔排序、快速排序、堆排序、归并排序和基数排序这五个复杂排序算法就展现出了显著的优势。
+    \item 通过观察代码，复杂排序算法一般会使用一些额外的储存空间，比如本项目实现的归并排序和基数排序都使用了 $O(n)$ 的额外空间。
+    \item 选择算法需要考虑数据规模和数据组织形式：
+    \begin{itemize}
+        \item 当数据规模较大，关键码随机分布，并且不要求稳定性，可以采用快速排序。
+        \item 当数据规模较小，序列已接近有序或者随机分布时，而且还要求稳定性，可以采用直接插入排序。
+        \item 当数据规模较大，并且对内存要求较高时，可以选择堆排序、快速排序、希尔排序。
+    \end{itemize}
+    \item 此外，还有一个优化方向是对归并或是快速排序来说，可以设置一个递归的宽度阈值，当子序列长度小于一个值时直接返回，对剩余的%
+        部分有序的序列做直接插入排序，会有一定的性能提升。
+\end{enumerate}
+
+
+\section{时间复杂度意味着？}
+
+观察实验结果发现，数据量小的时候每个排序的时间大致相同且他们都十分迅速地完成了排序。%
+而当使用100,000个数据的时候，冒泡、插入、选择排序所需的时间突然变长，超过了 30 秒。
+
+我们说一个算法的时间复杂度为 $O(f(n))$，其中的 $f(n)$ 是一个没有系数的项，因为他所用的时间%
+或是程序步的表达式的最高次项为 $f(n)$。那么，当数据体量 $n$ 增长为 $k \cdot n$ 时（$k$ 为常系数），%
+时间就会变成原来的 $$\frac{f(k \cdot n)}{f(n)}$$ 倍，这个数字在高次项上的放大是很明显的。
+
+冒泡、插入、选择排序都是$O(n^2)$ 的算法，因此当数据量变为原来的 $10$ 倍时，其耗时增加的规模是：%
+$$\frac{(10 \cdot n)^2}{n^2} = 100$$数据每翻10倍，耗时就翻100倍。
+
+\section{基数排序的表现}
+
+本项目的基数排序表现比快速排序差，原因有以下几点：
+
+\begin{enumerate}
+    \item 基数排序做了运行时类型检查，因为要保证数据是（无符号）整数类型。
+    \item 本项目默认使用 \lstinline{unsigned long} 类型，可以达到18,446,744,073,709,551,615，过多的位数会影响基数排序的表现。\\
+    实际上，有一个地方可以改变数据上限，只需解除下面行注释：
+\begin{lstlisting}[firstnumber=6, caption=规定数据上限]
+    //#define BOUND (100)
 \end{lstlisting}
-    用回车可以中断输入。
-
-    \item 插入输入不存在的位置
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 1       -$
-    Enter the position of candidate: 6      -$
-    Position should be between 1 to 5       -$
-    Try again: // ...
-\end{lstlisting}
-    位置不存在会提醒重新输入。
-
-    \item 删除：位置不存在
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    6                                       -$
-    Try again, enter 1 / 2: 
-    1                                       -$
-    Enter candidate's position to remove: 6 -$
-    Invalid Index
-    Position 6 not found!
-
-    Enter your command, 6 for menu:  // ...
-\end{lstlisting}
-    功能选择错误会提醒重新输入，位置不存在会有提示并退出。
-
-\item 删除：考号不存在
-\begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 2       -$
-    Choose to remove by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to remove: 0000    -$
-    Candidate with ID 0000 not found!
-
-    Enter your command, 6 for menu: // ...
-\end{lstlisting}
-    会给提示并退出。
-
-    \item 查找：找不到考号
-\begin{lstlisting} [style=console]
-    Enter your command, 6 for menu: 3
-    Enter candidate's ID to find: 
-    0000
-    Candidate with ID 0000 not found
-\end{lstlisting}
-    会给提示并退出。
-
-    \item 修改学生信息：位置或考号不存在
-\begin{lstlisting}[style=console]
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    1                                       -$
-    Enter candidate's position to edit: 6   -$
-    Invalid Index
-    Position 6 not found!
-    Enter your command, 6 for menu: 4       -$
-    Choose to edit by [1. Position, 2. Candidate ID]: 
-    2                                       -$
-    Enter candidate's ID to edit: 0000      -$
-    Candidate with ID 0000 not found!
-\end{lstlisting}
-    与删除类似。
-
+    \item 本项目基数排序的实现没有使用队列，每次在数组上遍历两次：第一次空出某一位数的位置，第二次填入空位。
 \end{enumerate}

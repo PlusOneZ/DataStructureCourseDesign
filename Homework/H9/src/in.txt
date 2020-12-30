@@ -1,0 +1,40 @@
+38
+5 5 5 2 5 5 6 5
+c01 ProgrammDesign 5 0
+c02 DiscreteMath 6 0 c01
+c03 DSandAlgo 4 0 c01 c02
+c04 ASM 5 0 c01
+c05 AlgoDesign 4 0 c03 c04
+c06 ComputerComponent 6 0
+c07 MicroComputer 4 0 c03
+c08 SCMicro 3 0 c03
+c09 Complie 5 0 c03
+c10 OS 4 0 c03
+c11 DataBase 5 0 c03
+c12 Math 6 0
+c13 LinearAlgebra 6 0
+c14 Statistics 6 0 c12
+c15 Physics 4 0 c12
+c16 ComputerCulture 3 0
+c17 SystemStructure 6 0 c06
+c18 CSNet 5 0 c03
+c19 Communication 6 0
+c20 OOP 3 0 c01 c03
+c21 Java 3 0 c01 c03
+c22 C#.net 5 0 c01 c03
+c23 PowerBuilder 5 0 c01 c03
+c24 VC++ 3 0 c01 c03
+c25 ASP 5 0 c01 c03
+c26 JSP 5 0 c01 c03
+c27 VB.net 5 0 c01 c03
+c28 Delphi 5 0 c01 c03
+c29 C++Builder 5 0 c01 c03
+c30 English 5 1
+c31 English 5 2
+c32 English 5 3
+c33 English 5 4
+c34 English 5 5
+c35 English 5 6
+c36 English 5 7
+c37 English 5 8
+c38 Chinese 3 1

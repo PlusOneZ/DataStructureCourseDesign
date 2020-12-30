@@ -68,6 +68,7 @@ public:
     void resize(size_t hint) { ht.resize(hint); }
     inline void insert(const Key& s, const Value& val);
     inline void insert(const MapPair& pair);
+    inline size_t numElements() { return ht.numElements(); };
 
 private:
     HashTable<

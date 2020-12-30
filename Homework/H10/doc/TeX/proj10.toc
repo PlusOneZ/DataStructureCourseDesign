@@ -1,0 +1,59 @@
+\contentsline {part}{第一部分\hspace {\ccwd }设计}{1}{part.1}%
+\contentsline {chapter}{\numberline {第一章}背景分析}{2}{chapter.1}%
+\contentsline {chapter}{\numberline {第二章}功能设计}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}题意转化}{3}{section.2.1}%
+\contentsline {section}{\numberline {2.2}冒泡排序}{3}{section.2.2}%
+\contentsline {subsubsection}{描述}{3}{subsubsection*.2}%
+\contentsline {subsubsection}{性能}{4}{subsubsection*.4}%
+\contentsline {section}{\numberline {2.3}选择排序}{4}{section.2.3}%
+\contentsline {subsubsection}{描述}{4}{subsubsection*.5}%
+\contentsline {subsubsection}{性能}{4}{subsubsection*.7}%
+\contentsline {section}{\numberline {2.4}直接插入排序}{5}{section.2.4}%
+\contentsline {subsubsection}{描述}{5}{subsubsection*.8}%
+\contentsline {subsubsection}{性能}{5}{subsubsection*.10}%
+\contentsline {section}{\numberline {2.5}希尔排序}{5}{section.2.5}%
+\contentsline {subsubsection}{描述}{6}{subsubsection*.11}%
+\contentsline {subsubsection}{性能}{7}{subsubsection*.14}%
+\contentsline {section}{\numberline {2.6}快速排序}{7}{section.2.6}%
+\contentsline {subsubsection}{描述}{7}{subsubsection*.15}%
+\contentsline {subsubsection}{性能}{8}{subsubsection*.17}%
+\contentsline {section}{\numberline {2.7}堆排序}{8}{section.2.7}%
+\contentsline {subsubsection}{描述}{8}{subsubsection*.18}%
+\contentsline {subsubsection}{性能}{9}{subsubsection*.20}%
+\contentsline {section}{\numberline {2.8}归并排序}{9}{section.2.8}%
+\contentsline {subsubsection}{描述}{9}{subsubsection*.21}%
+\contentsline {subsubsection}{性能}{11}{subsubsection*.23}%
+\contentsline {section}{\numberline {2.9}基数排序}{11}{section.2.9}%
+\contentsline {subsubsection}{描述}{11}{subsubsection*.24}%
+\contentsline {subsubsection}{性能}{11}{subsubsection*.26}%
+\contentsline {part}{第二部分\hspace {\ccwd }实现}{13}{part.2}%
+\contentsline {chapter}{\numberline {第三章}类结构}{14}{chapter.3}%
+\contentsline {section}{\numberline {3.1}概述}{14}{section.3.1}%
+\contentsline {section}{\numberline {3.2}SortingSystem 类定义}{14}{section.3.2}%
+\contentsline {chapter}{\numberline {第四章}辅助设计}{17}{chapter.4}%
+\contentsline {chapter}{\numberline {第五章}排序实现}{18}{chapter.5}%
+\contentsline {section}{\numberline {5.1}冒泡排序}{18}{section.5.1}%
+\contentsline {section}{\numberline {5.2}选择排序}{18}{section.5.2}%
+\contentsline {section}{\numberline {5.3}直接插入排序}{18}{section.5.3}%
+\contentsline {section}{\numberline {5.4}希尔排序}{19}{section.5.4}%
+\contentsline {section}{\numberline {5.5}快速排序}{19}{section.5.5}%
+\contentsline {section}{\numberline {5.6}堆排序}{20}{section.5.6}%
+\contentsline {section}{\numberline {5.7}归并排序}{21}{section.5.7}%
+\contentsline {section}{\numberline {5.8}基数排序}{22}{section.5.8}%
+\contentsline {part}{第三部分\hspace {\ccwd }测试}{24}{part.3}%
+\contentsline {chapter}{\numberline {第六章}功能测试}{25}{chapter.6}%
+\contentsline {chapter}{\numberline {第七章}数据测试}{26}{chapter.7}%
+\contentsline {section}{\numberline {7.1}100个数据}{26}{section.7.1}%
+\contentsline {section}{\numberline {7.2}1,000个数据}{27}{section.7.2}%
+\contentsline {section}{\numberline {7.3}10,000个数据}{28}{section.7.3}%
+\contentsline {section}{\numberline {7.4}100,000个数据}{29}{section.7.4}%
+\contentsline {section}{\numberline {7.5}更多数据情况}{30}{section.7.5}%
+\contentsline {subsection}{\numberline {7.5.1}1,000,000个数据}{30}{subsection.7.5.1}%
+\contentsline {subsection}{\numberline {7.5.2}10,000,000个数据}{31}{subsection.7.5.2}%
+\contentsline {subsection}{\numberline {7.5.3}100,000,000个数据}{32}{subsection.7.5.3}%
+\contentsline {chapter}{\numberline {第八章}探究}{34}{chapter.8}%
+\contentsline {section}{\numberline {8.1}各种排序算法比较}{34}{section.8.1}%
+\contentsline {section}{\numberline {8.2}时间复杂度意味着？}{34}{section.8.2}%
+\contentsline {section}{\numberline {8.3}基数排序的表现}{35}{section.8.3}%
+\contentsline {chapter}{图片索引}{37}{section*.29}%
+\contentsfinish 

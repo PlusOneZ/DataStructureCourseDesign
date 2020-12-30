@@ -20,8 +20,9 @@ add_executable(DataStructure
 #        Homework/H5/src/Project5.cpp
 #        Homework/H6/src/Project6.cpp
 #        Homework/H7/src/Project7.cpp
-        Homework/H8/src/Project8.cpp
-#        Homework/H9/src/Project9.cpp
+#        Homework/H8/src/Project8.cpp
+        Homework/H9/src/Project9.cpp
+#        Homework/H9/src/ref.cpp
 #        Homework/H10/src/Project10.cpp
 
 #        MyDS/Vector.cpp
@@ -41,8 +42,6 @@ add_executable(DataStructure
 #        MyDS/HuffmanTree.h
 #        MyDS/MinHeap.cpp
 #        MyDS/MinHeap.h
-#        Homework/H8/ref.cpp
-#        Homework/H9/ref.cpp
 #        MyDS/HashMap.cpp
 #        MyDS/HashMap.h
         )
