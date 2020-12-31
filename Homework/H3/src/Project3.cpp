@@ -293,4 +293,7 @@ std::ostream &operator<<(std::ostream &os, Maze::Position &p) {
 int main() {
     Maze m;
     m.run();
+    std::cout << "Press any key to quit." << std::endl;
+    getchar();
+    return 0;
 }

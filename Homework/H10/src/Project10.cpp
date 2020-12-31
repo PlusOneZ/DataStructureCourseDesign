@@ -2,6 +2,7 @@
 #include <random>
 #include <limits>
 #include <ctime>
+#include <cstring>
 
 //#define BOUND (100)
 

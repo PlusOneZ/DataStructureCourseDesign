@@ -1,76 +1,39 @@
 
 \chapter{背景分析}
 
-考试报名工作给各高校报名工作带来了新的挑战，给教务管理部门增加了很大的工作量。随着信息时代的来临，手动输入管理考生的信息效率低下%
-且容易出错，管理起来十分不便。如何快速地处理大规模的数据以及频繁的查询，是当今考试报名系统需要解决的关键问题。
+排课，即课程编排，是指学校为了正常进行教学工作，对班级、教师、课程及学校教学资源合理安排，制定各种各样课程表的行为。%
+给大学合理编排课程，不仅需要考虑课程之间的依赖关系：有些课程需要比其他课程更先修读；还要解决课程编排的合理性：不能一次性%
+上多个课时，多课时课程需要拆开来隔天上。
 
-使用使用计算机技术来进行考试信息的维护和管理，其具有管理容量上限高，管理快速，成本低等多个巨大优势，能极大提升考试报名管理的效率。%
-本项目是对考试报名管理系统的简单模拟，系统主要有以下功能：输出考生信息、查询考生信息、添加考生信息、修改考生信息和删除考生信息。
+本项目模拟了一个排课系统，通过规定的输入指定课程的信息，最后要求输出一个学生8个学期的课程编排。
 
-系统需要维护一个内存中的报名表，表中包含的信息有准考证号，姓名，性别，年龄和报考类别等。并能够通过准考证号查询到考生，指定修改信息、%
-删除等功能。
-
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{src/course.png}
+    \caption{软件学院学生大二下课表}
+\end{figure}
 
 
 \chapter{功能设计}
 
 \section{题意转化}
-依据题意，需要使用一个数据结构将学生信息存储起来，并能做到{\kaishu 增、删、查、改}四个功能。有许多数据结构都能做到这项功能%
-简单的有、{\kaishu 线性表}，如数组、链表等结构，复杂的有哈希表，以及二叉查找树、平衡二叉树等非线性结构。%
-本题使用了{\kaishu 双链表}作为主要的数据结构储存信息，双链表的数据组织如下图。
 
-\newcommand{\data}{
-      data \nodepart{second}
-      \phantom{\texttt{NULL}}
-    }
+按照要求，需要对课表进行读取、编排以及输出，所以项目分为几个部分；
 
-\begin{figure}[H]
-    \tikzstyle{ptr}  = [draw, -{Stealth[scale=1.0]}, blue]
-    \tikzstyle{head} = [rectangle, draw, text height=3mm, text width=3mm,
-                        text centered, node distance=3cm, inner sep=0pt]
-    \tikzstyle{data} = [rectangle split, rectangle split parts=3, draw, node distance=2.5cm, 
-                        text centered, minimum height=3em]
-    \centering
-    \begin{tikzpicture} [node distance=2cm, auto]
-    \node[data, node distance=2.5cm] (A) {data \nodepart{third} \footnotesize{nullptr}};
-    \node[data, right of=A] (B) {\data};
-    \node[data, right of=B] (C) {\data};
-    \node[data, right of=C] (D) {\data};
-    \node[data, right of=D] (E) {\data};
-    \node[data, right of=E, node distance=2.5cm] (last) {data \nodepart{second} \footnotesize{nullptr}};
-    
-    \draw[fill] ($(A.south)!0.67!(A.text split)$) circle (0.05);
-    \draw[ptr] ($(A.south)!0.67!(A.text split)$) --++(right:10mm) |- ($(B.south west)!0.67!(B.text split west)$);
-    \draw[fill] ($(B.south)!0.67!(B.text split)$) circle (0.05);
-    \draw[ptr] ($(B.south)!0.67!(B.text split)$) --++(right:10mm) |- ($(C.south west)!0.67!(C.text split west)$);
-    \draw[fill] ($(C.south)!0.67!(C.text split)$) circle (0.05);
-    \draw[ptr] ($(C.south)!0.67!(C.text split)$) --++(right:10mm) |- ($(D.south west)!0.67!(D.text split west)$);
-    \draw[fill] ($(D.south)!0.67!(D.text split)$) circle (0.05);
-    \draw[ptr] ($(D.south)!0.67!(D.text split)$) --++(right:10mm) |- ($(E.south west)!0.67!(E.text split west)$);
-    \draw[fill] ($(E.south)!0.67!(E.text split)$) circle (0.05);
-    \draw[ptr] ($(E.south)!0.67!(E.text split)$) --++(right:10mm) |- ($(last.south west)!0.67!(last.text split west)$);
+\begin{itemize}
+    \item 读取文件并将文本数据转换为程序中的对象。
+    \item 给对象排序以保证先修课程满足要求。
+    \item 编排对象，将课程填入课程表。
+    \item 将结果输出至屏幕和另一个文件。
+\end{itemize}
 
-    \draw[fill] ($(B.south)!0.3!(B.text split)$) circle (0.05);
-    \draw[ptr] ($(B.south)!0.3!(B.text split)$) --++(left:10mm) |- ($(A.south east)!0.3!(A.text split east)$);
-    \draw[fill] ($(C.south)!0.3!(C.text split)$) circle (0.05);
-    \draw[ptr] ($(C.south)!0.3!(C.text split)$) --++(left:10mm) |- ($(B.south east)!0.3!(B.text split east)$);
-    \draw[fill] ($(D.south)!0.3!(D.text split)$) circle (0.05);
-    \draw[ptr] ($(D.south)!0.3!(D.text split)$) --++(left:10mm) |- ($(C.south east)!0.3!(C.text split east)$);
-    \draw[fill] ($(E.south)!0.3!(E.text split)$) circle (0.05);
-    \draw[ptr] ($(E.south)!0.3!(E.text split)$) --++(left:10mm) |- ($(D.south east)!0.3!(D.text split east)$);
-    \draw[fill] ($(last.south)!0.3!(last.text split)$) circle (0.05);
-    \draw[ptr] ($(last.south)!0.3!(last.text split)$) --++(left:10mm) |- ($(E.south east)!0.3!(E.text split east)$);
-    
-    
-    \end{tikzpicture}
-    \caption{双链表结构示意图}
-\end{figure}
+从中可以提取出的数据结构内容是：在排序这个课表的时候，由于有先修课要求，因此要保证课程之间是拓扑有序的。如果将每一门课视作图的顶点，%
+用一条有向的边$<u, v>$表示 $u$ 是$v$的先修课程，这样就可以对整个课表中的所有课程先做一次排序，再按顺序将这个课程填入课表。
 
-通过单向访问节点可以增加、修改、删除一个节点，这三个操作的时间复杂度均为 $O(1)$ 级别的，而查找某个节点的时间复杂度是 $O(n)$ 级别的。%
-由于查找操作在一个考试系统中较为频繁的出现，所以在用链表储存有序的考生名单的基础上，我决定加用{\kaishu 哈希表}\emph{(Hash Table)}辅助进行查找，%
-哈希表的插入和删除时间复杂度均可看作 $O(1)$ 级别，其特点是空间复杂度为 $\Omega(n)$\footnote{$\Omega$ 为下界}，其中 $n$ 为存储%
-在表内的数据数量。本项目中，哈希表存放的是{\kaishu <考号, 节点指针>}的键值对。
+所以主要的逻辑存储结构是一个 {\kaishu  图}，因为图的顶点是通过课号来索引的，我将课程的编号存在一个哈希map中，键对应的值是一门课程%
+之后在拓扑排序时会将课程通过键来索引，之后压入队列中。
+
+以下是哈希表和队列的示意图。
 
 {
 \begin{figure}[H]
@@ -114,143 +77,76 @@
 \end{figure}
 }
 
-\vspace*{1.0cm}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture} [shorten >=1pt,
+        vertex/.style={circle,fill=black!25,minimum size=17pt,inner sep=0pt}]
+    \foreach \name/\x in {1/1, 2/2, 3/3, 4/4, 5/5, 6/6, 7/7}
+        \node[vertex] (G-\name) at (\x,0) {$\name$};
+    \foreach \from/\to in {1/2, 2/3, 3/4, 3/4, 4/5, 5/6, 6/7}
+        \draw (G-\from) -- (G-\to);
+    \node (de) at (0,-1) {dequeue};
+    \node (en) at (8, -1) {enqueue};
+    \draw [->] (G-1) .. controls (0,0) .. (de); 
+    \draw [<-] (G-7) .. controls (8,0) .. (en);
+    \end{tikzpicture}
+    \caption{队列操作示意图}
+\end{figure}
+
+以下是课程之间依赖关系可能构成的图，如果按照这种结构，则序列 \lstinline{[c01, c02, c03, c04, c05, c06]} 就是%
+拓扑有序的。
+
+\begin{figure}[H]
+    \tikzstyle{house} = [circle, minimum width=8mm, draw=black]
+    \tikzstyle{link} = [thick, ->]
+    
+    \centering
+    \begin{tikzpicture}
+        \node [house] at (-3, 3)  (A) {c01};
+        \node [house] at (-2, 0)  (B) {c02};
+        \node [house] at (-1, -2) (C) {c03};
+        \node [house] at (1, 2)   (D) {c04};
+        \node [house] at (2, -2)  (E) {c05};
+        \node [house] at (3, 0)   (F) {c06};
+
+        \draw [link ] (A) --  (B);
+        \draw [link ] (B) --  (C);
+        \draw [link ] (B) --  (D);
+        \draw [link ] (C) --  (E);
+        \draw [link ] (C) --  (F);
+        \draw [link ] (A) --  (E);
+        \draw [link ] (B) --  (F);
+        \draw [link ] (E) -- (F);
+        \draw [link ] (D) --  (F);
+
+    \end{tikzpicture}
+    \caption{课程连接模型}
+    \label{net}
+\end{figure}
+
+
+
 
 \section{逻辑功能}
-{\kaishu 增、删}功能对应于双链表结构中的{\kaishu 插入、删除}功能，哈希表优化后的{\kaishu 查找}功能通过%
-哈希表的{\kaishu 查询（或索引）}功能实现。{\kaishu 修改}功能则是查找和赋值的结合。四种操作都十分简单。
 
-但由于考试报名系统中维护了一个顺序的双链表和一个哈希表，在{\kaishu 增、删、改}这三个需要改变数据的操作中，%
-在修改链表数据的{\kaishu 同时}一起修改哈希表当中的数据是十分必要的。因此，逻辑重点在于同时维护两套数据并使系统正常工作。
+本项目有以下几个步骤
 
-\section{维护两套数据}
-
-\tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 2cm, 
-        minimum height=1cm, text centered, draw = black, fill = red!40,
-        font = {\bfseries}]
-    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, 
-    minimum width=2cm, minimum height=1cm, text centered, draw=black, fill = blue!40]
-    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill = yellow!50]
-    \tikzstyle{condition} = [diamond, aspect = 3, text centered, draw=black, fill = green!30]
-    \tikzstyle{arr} = [->, >=stealth, thick]
-
-\subsection{增加信息}
-增加操作是最简单的操作，流程图如下：
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {读取到 \lstinline{S}};
-            \node [condition, below=1cm of input] (cond) {\lstinline{S} 考号已经存在？};
-            \node [process, below=.7cm of cond] (toList) {\lstinline{S} 加入链表};
-            \node [process, below=.6cm of toList] (toMap) {\lstinline{S} 加入哈希表};
-            \node [startstop, below=.6cm of toMap] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- node[anchor=west] {否} (toList);
-            \draw [arr] (toList) -- (toMap);
-            \draw [arr] (toMap) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.5, 0)$) node[anchor = west] {是} |- ($ (cond.north) + (0, 0.5) $);
-
-        \end{tikzpicture}
-        \caption{添加考生信息逻辑图\label{add}}
-    \end{figure}
-}
-
-
-\subsection{删除信息}
-删除与增加类似，流程图如下：
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [condition, below=.7cm of input] (cond) {\lstinline{num} 考号存在？};
-            \node [process, left=1.3cm of cond] (toList) {\lstinline{S} 从链表删除};
-            \node [process, below=.6cm of toList] (toMap) {\lstinline{S} 从哈希表抹去};
-            \node [io, right=1.3cm of toMap] (out) {输出出考生信息};
-            \node [startstop, below=1cm of out] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- node[anchor=north] {是} (toList);
-            \draw [arr] (toList) -- (toMap);
-            \draw [arr] (toMap) -- (out);
-            \draw [arr] (out) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.9, 0)$) node[anchor = west] {否} |- ($ (end.north) + (0, 0.5) $);
-
-        \end{tikzpicture}
-        \caption{删除考生信息逻辑图\label{del}}
-    \end{figure}
-}
-
-\subsection{查找考生信息}
-通过调用哈希表的查询方法可以很快的找到考生并输出信息，流程图如下：
-
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [condition, below=.7cm of input] (cond) {\lstinline{S} 考号存在？};
-            \node [process, below=.7cm of cond, xshift=-2.75cm] (find) {找到考生};
-            \node [io, below=.7cm of find] (out) {输出考生信息};
-            \node [io, below=.7cm of cond, xshift=2.75cm] (outErr) {输出错误提示};
-            \node [startstop, below=.6cm of out, xshift=2.5cm] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (cond);
-            \draw [arr] (cond) -- ($(cond.west) + (-0.5, 0)$) node[anchor=east] {是} -- (find.north);
-            \draw [arr] (find) -- (out);
-            \draw [arr] (out) -- (end);
-            \draw [arr] (outErr) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.5, 0)$) node[anchor = west] {否} -- (outErr.north);
-
-        \end{tikzpicture}
-        \caption{查询考生信息逻辑图\label{find}}
-    \end{figure}
-}
-
-\subsection{修改考生信息}
-修改考生信息除了要先找到考生之外，还有一些对哈希表操作的细节。流程图如下：
-
-{
-    \begin{figure}[H]
-        \centering
-        \begin{tikzpicture}
-            \node (start) [startstop]  {开始};
-            \node [io, below=.7cm of start] (input) {输入考号 \lstinline{num}};
-            \node [process, below=.7cm of input] (find) {用 \lstinline{num} 查询考生 \lstinline{S}};
-            \node [condition, below=.7cm of find] (cond) {\lstinline{S} 不为空？};
-            \node [process, below=.8cm of cond] (erase) {\lstinline{S} 从哈希表抹去};
-            \node [io, below=.7cm of erase] (input2) {读取到 \lstinline{S}};
-            \node [condition, below=.6cm of input2] (cond2) {\lstinline{S} 考号已经存在？};
-            \node [process, below=.8cm of cond2] (add) {\lstinline{S} 加入哈希表};
-            \node [startstop, below=.8cm of add] (end) {结束};
-
-            \draw [arr] (start) -- (input);
-            \draw [arr] (input) -- (find);
-            \draw [arr] (find) -- (cond);
-            \draw [arr] (cond) -- node[anchor=east] {是} (erase);
-            \draw [arr] (erase) -- (input2);
-            \draw [arr] (input2) -- (cond2);
-            \draw [arr] (cond2) --  node[anchor=east] {否} (add);
-            \draw [arr] (add) -- (end);
-
-            \draw [arr] (cond) -- ($(cond.east) + (0.9, 0)$) node[anchor = west] {否} |- ($ (end.north) + (0, 0.5) $);
-            \draw [arr] (cond2) -- ($(cond2.west) + (-0.5, 0)$) node[anchor = east] {是} |- ($ (cond2.north) + (0, 0.3) $);
-
-        \end{tikzpicture}
-        \caption{修改考生信息逻辑图\label{mod}}
-    \end{figure}
-}
-
-重点在于哈希表存放了{\kaishu <考号, 节点指针>}的键值对，所以在修改时如果要判断修改后考号是否重复，就要先将修改前考号的键值对抹去，这样在检查是否%
-重复考号时的哈希表才是有效的。修改完成后再将该{\kaishu <考号, 节点指针>}对加入回哈希表，完成一次修改。
+\begin{enumerate}
+    \item 读取输入到程序。
+    \item 将课程进行拓扑排序，具体过程是：
+    \begin{enumerate}
+        \item 初始化一个队列，先将已经规定开课学期的课程入队。
+        \item 将入度为0的课程顶点入队。
+        \item 对于已经入队的课程，遍历它指向的邻接节点，将他们的入度减一。
+        \item 如果减少入度之后入度为0，将它入队。
+    \end{enumerate}
+    完成后，如果存在还没入队的课程，则说明有循环依赖的存在。
+    \item 将队列中的每个课程填入课表，具体流程如下：
+    \begin{enumerate}
+        \item 如果本学期算上这门课已经超出课时上限，就排到下一个学期。
+        \item 如果课程时间大于3课时，先找三节连上的，否则找两节或是一节课的空隙。
+        \item 连排时如果2天内已经排了同一门课，就将天数加一。
+        \item 如果无法满足要求，则放弃间隔排课的限制，重新从三节联排尝试到一节课的排课。
+    \end{enumerate}
+    \item 将排好的课程填入字符串并输出。
+\end{enumerate}

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include <limits>
 
 #ifndef _NOEXCEPT
 #define _NOEXCEPT noexcept
@@ -105,7 +106,7 @@ Vector<ElemType> &Vector<ElemType>::operator=(Vector<ElemType> const &another) {
 
 template<class ElemType>
 Vector<ElemType>::Vector(const Vector<ElemType> &vec) {
-    data = new ElemType[LowerBound];
+    data = new ElemType[vec.capacity];
     *this = vec;
 }
 
@@ -800,9 +801,9 @@ public:
     explicit Vertex<Tag>(const Tag &t) : tag(t) {};
 
     Vertex<Tag>& find(const Tag &t) {
-        for (int i = 0; i < adjacents.length(); ++i) {
-            if (adjacents[i].tag == t) {
-                return adjacents[i];
+        for (int i = 0; i < next.length(); ++i) {
+            if (next[i].tag == t) {
+                return next[i];
             }
         }
         throw GraphException("Adjacency not found");
@@ -811,7 +812,7 @@ public:
     size_t index = 0;
     int inDegree = 0;
     Tag tag;
-    Vector<Vertex *> adjacents;
+    Vector<Vertex *> next;
 };
 
 
@@ -845,8 +846,8 @@ void Graph<VTag>::addEdge(const VTag &u, const VTag &v) {
 template<class VTag>
 void Graph<VTag>::addEdge(size_t u, size_t v) {
     try {
-        vertexes[u]->adjacents.pushBack(vertexes[v]);
-        vertexes[v]->adjacents.pushBack(vertexes[u]);
+        vertexes[u]->next.pushBack(vertexes[v]);
+        vertexes[v]->next.pushBack(vertexes[u]);
     } catch (IllegalVectorAccessing &e) {
         throw GraphException("Vertexes out of range");
     }
@@ -871,6 +872,7 @@ void Graph<VTag>::clear() {
     vertexes.clear();
 }
 
+///------------------------------- Course -----------------------------------///
 struct Course {
     Course() = default;
     Course(const string& i, const string& n, int h, int s, bool hasPre) :
@@ -885,7 +887,6 @@ struct Course {
     bool havePre = false;
     Vector<string> pres;
 };
-
 
 class CourseTable {
 public:
@@ -924,7 +925,7 @@ std::ostream &CourseTable::show(std::ostream &os) {
 }
 
 
-
+///------------------------- SchedulingSystem -------------------------------///
 class SchedulingSystemException : std::exception {
 public:
     explicit SchedulingSystemException(const char* s) : content(s) { }
@@ -952,6 +953,44 @@ private:
     Graph<string> coursesGraph;
     HashMap<int, Course> coursesMap;
 };
+
+void SchedulingSystem::arrange() {
+    using std::cout; using std::endl;
+    int semester = 0;
+    int courseCnt = 0;
+    Vector<int> inDegrees;
+    Queue<int> validCourses;
+    int i;
+    for (i = 0; i < coursesGraph.vertexes.length(); ++i)
+        inDegrees.pushBack(coursesGraph.vertexes[i]->inDegree);
+
+    for (i = 0; i < inDegrees.length(); ++i) {
+        if (coursesMap[i].semester != 0)
+            validCourses.enqueue(i);
+    }
+    for (i = 0; i < inDegrees.length(); ++i) {
+        if (inDegrees[i] == 0 && coursesMap[i].semester == 0)
+            validCourses.enqueue(i);
+    }
+    while (!validCourses.isEmpty()) {
+        int cur;
+        validCourses.dequeue(cur);
+        auto CurCourse = coursesMap[cur];
+        addCourse(CurCourse, semester);
+        courseCnt++;
+        for (i = 0; i < coursesGraph.vertexes[cur]->next.length(); ++i) {
+            int NextVertexes = coursesGraph.vertexes[cur]->next[i]->index;
+            --inDegrees[NextVertexes];
+            if (inDegrees[NextVertexes] == 0) {
+                validCourses.enqueue(NextVertexes);
+                coursesMap[NextVertexes].earliestSemester = (semester + 1);
+            }
+        }
+    }
+    if (courseCnt < coursesMap.numElements()) {
+        throw SchedulingSystemException("Courses prerequisite form loops.");
+    }
+}
 
 void SchedulingSystem::addCourse(Course &course, int &semester) {
     using std::cout; using std::endl;
@@ -1005,7 +1044,7 @@ void SchedulingSystem::addCourse(Course &course, int &semester) {
             }
         }
     }
-    if (courseHours >= 2) { //尝试隔天连续两节排课
+    if (courseHours >= 2) {
         for (day = 0; day < 5; ++day) {
             if (courseHours < 2) break;
             if (daysOccupied[day] ||
@@ -1024,7 +1063,7 @@ void SchedulingSystem::addCourse(Course &course, int &semester) {
             }
         }
     }
-    if (courseHours >= 1) { //尝试隔天排课
+    if (courseHours >= 1) {
         for (day = 0; day < 5; ++day) {
             if (courseHours < 1) break;
             if (daysOccupied[day] ||
@@ -1041,7 +1080,7 @@ void SchedulingSystem::addCourse(Course &course, int &semester) {
             }
         }
     }
-    if (courseHours >= 3) {//尝试不隔天连续三节排课
+    if (courseHours >= 3) {
         for (day = 0; day < 5; ++day) {
             if (courseHours < 3)break;
             for (hour = 0; hour < 8; ++hour) {
@@ -1058,7 +1097,7 @@ void SchedulingSystem::addCourse(Course &course, int &semester) {
             }
         }
     }
-    if (courseHours >= 2) {//尝试不隔天连续两节排课
+    if (courseHours >= 2) {
         for (day = 0; day < 5; ++day) {
             if (courseHours < 2)break;
             for (hour = 0; hour < 9; ++hour) {
@@ -1072,7 +1111,7 @@ void SchedulingSystem::addCourse(Course &course, int &semester) {
             }
         }
     }
-    if (courseHours >= 1) { //仍然未排完
+    if (courseHours >= 1) {
         for (day = 0; day < 5; ++day) {
             if (courseHours < 1)break;
             for (hour = 0; hour < 10; ++hour) {
@@ -1099,44 +1138,6 @@ void
 SchedulingSystem::setCourseHours(int sem, int d, int h, int span, const Course& c) {
     for (int i = 0; i < span; ++i) {
         semesters[sem].arrangement[d][h + i] = c.name;
-    }
-}
-
-void SchedulingSystem::arrange() {
-    using std::cout; using std::endl;
-    int semester = 0;
-    int courseCnt = 0;
-    Vector<int> indegrees;
-    Queue<int> maxVertexes;
-    int i;
-    for (i = 0; i < coursesGraph.vertexes.length(); ++i)
-        indegrees.pushBack(coursesGraph.vertexes[i]->inDegree);
-
-    for (i = 0; i < indegrees.length(); ++i) {
-        if (coursesMap[i].semester != 0)
-            maxVertexes.enqueue(i);
-    }
-    for (i = 0; i < indegrees.length(); ++i) {
-        if (indegrees[i] == 0 && coursesMap[i].semester == 0)
-            maxVertexes.enqueue(i);
-    }
-    while (!maxVertexes.isEmpty()) {
-        int cur;
-        maxVertexes.dequeue(cur);
-        auto CurCourse = coursesMap[cur];
-        addCourse(CurCourse, semester);
-        courseCnt++;
-        for (i = 0; i < coursesGraph.vertexes[cur]->adjacents.length(); ++i) {
-            int NextVertexes = coursesGraph.vertexes[cur]->adjacents[i]->index;
-            --indegrees[NextVertexes];
-            if (indegrees[NextVertexes] == 0) {
-                maxVertexes.enqueue(NextVertexes);
-                coursesMap[NextVertexes].earliestSemester = (semester + 1);
-            }
-        }
-    }
-    if (courseCnt < coursesMap.numElements()) {
-        throw SchedulingSystemException("Courses prerequisite form loops.");
     }
 }
 
@@ -1195,13 +1196,16 @@ int main() {
     std::fstream out;
     out.open("out.txt", std::ios_base::out | std::ios_base::binary);
     try {
-        ss.readFile("in.txt");
+        ss.readFile("./in.txt");
         ss.arrange();
         ss.outputToStream(std::cout);
         ss.outputToStream(out);
     }
     catch (SchedulingSystemException &e) {
-        std::cout << e.what();
+        std::cout << e.what() << std::endl;
     }
+    std::cout << "Press any key to quit." << std::endl;
+    getchar();
     return 0;
 };
+
