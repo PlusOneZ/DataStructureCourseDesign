@@ -9,16 +9,16 @@
 
 以下是各个文件的快速访问链接：
 
-- [考试报名系统](./Projects/P)
-- [两个有序链表序列的交集](./Projects/P)
-- [勇闯迷宫游戏](./Projects/P)
-- [算数表达式求解](./Projects/P)
-- [银行业务](./Projects/P)
-- [家谱管理系统](./Projects/P)
-- [修理牧场](./Projects/P)
-- [电网建设造价模拟系统](./Projects/P)
-- [排课软件](./Projects/P)
-- [8种排序算法的比较案例](./Projects/P)
+- [考试报名系统](./Projects/P1)
+- [两个有序链表序列的交集](./Projects/P2)
+- [勇闯迷宫游戏](./Projects/P3)
+- [算数表达式求解](./Projects/P4)
+- [银行业务](./Projects/P5)
+- [家谱管理系统](./Projects/P6)
+- [修理牧场](./Projects/P7)
+- [电网建设造价模拟系统](./Projects/P8)
+- [排课软件](./Projects/P9)
+- [8种排序算法的比较案例](./Projects/P10)
 
 ## 项目文件结构
 
